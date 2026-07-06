@@ -355,12 +355,12 @@ Beberapa hasil karya dan momen terbaik yang telah kami abadikan.
 
     <div class="container">
 
-        <div class="row gy-5">
+    <div class="row gy-5 justify-content-between">
 
             <!-- ===========================
                     KOLOM 1
             =========================== -->
-            <div class="col-lg-4">
+            <div class="col-lg-3">
 
                 <div class="footer-logo">
                     Lafayette
@@ -376,45 +376,61 @@ Beberapa hasil karya dan momen terbaik yang telah kami abadikan.
                     elegan, dan penuh cerita.
                 </p>
 
-                <div class="follow-us">
+            </div> 
 
-                    <span></span>
+                   <!-- ===========================
+        KOLOM 2
+=========================== -->
 
-                    <p>Follow Us</p>
+<div class="col-lg-3">
 
-                    <span></span>
+    <h4 class="footer-title">
+        Follow Us
+    </h4>
 
-                </div>
+    <div class="footer-social">
 
-                <div class="footer-social">
+        <a href="https://www.instagram.com/lafayettestudio.id"
+           target="_blank"
+           class="social-card">
 
-                    <a href="https://www.instagram.com/lafayettestudio.id"
-                        target="_blank">
+            <i class="bi bi-instagram"></i>
 
-                        <i class="bi bi-instagram"></i>
+            <div>
 
-                        Instagram
+                <strong>Instagram</strong>
 
-                    </a>
-
-                    <a href="https://www.tiktok.com/@lafayettestudio.id"
-                        target="_blank">
-
-                        <i class="bi bi-tiktok"></i>
-
-                        TikTok
-
-                    </a>
-
-                </div>
+                <small>@lafayettestudio.id</small>
 
             </div>
+
+        </a>
+
+        <a href="https://www.tiktok.com/@lafayettestudio.id"
+           target="_blank"
+           class="social-card">
+
+            <i class="bi bi-tiktok"></i>
+
+            <div>
+
+                <strong>TikTok</strong>
+
+                <small>@lafayettestudio.id</small>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
 
             <!-- ===========================
                     KOLOM 2
             =========================== -->
 
-            <div class="col-lg-4">
+            <div class="col-lg-3">
 
                 <h4 class="footer-title">
 
@@ -468,7 +484,7 @@ Beberapa hasil karya dan momen terbaik yang telah kami abadikan.
                     KOLOM 3
             =========================== -->
 
-            <div class="col-lg-4">
+            <div class="col-lg-3">
 
                 <h4 class="footer-title">
 
@@ -510,7 +526,7 @@ Beberapa hasil karya dan momen terbaik yang telah kami abadikan.
 
         </div>
 
-    </div>
+     </div>
 
 </footer>
 
