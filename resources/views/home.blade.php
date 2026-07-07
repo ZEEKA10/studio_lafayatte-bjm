@@ -30,8 +30,11 @@
     <span class="logo-subtitle">
         PHOTO STUDIO
     </span>
-
-        </a>
+    </a>
+    
+    <button class="menu-toggle" id="menuToggle">
+        <i class="bi bi-list"></i>
+    </button>
 
         <div class="navbar-menu">
 
