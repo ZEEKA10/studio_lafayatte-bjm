@@ -1206,16 +1206,62 @@ section{
 
 
 /* ===========================
-        TABLET (≤992px)
+        TABLET & MOBILE
 =========================== */
 
 @media (max-width:992px){
 
-    .menu-toggle{display:block;
+    /* Tombol hamburger muncul */
+    .menu-toggle{
+        display:block;
+    }
+
+    /* Menu desktop disembunyikan */
+    .navbar-menu{
+        display:none;
+    }
+
+    /* Tombol Admin Login disembunyikan */
+    .navbar-action{
+        display:none;
+    }
+
+
+
+/* ==========================
+      MOBILE MENU
+========================== */
+
+.navbar-menu{
+
+    display:none;
+
+    position:absolute;
+
+    top:100%;
+
+    left:0;
+
+    width:100%;
+
+    background:#fff;
+
+    padding:25px;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+
 }
 
-.navbar-action{display:none;
+.navbar-menu.active{
+
+    display:flex;
+
 }
+
     /* ---------- Navbar ---------- */
 
     .navbar-menu{

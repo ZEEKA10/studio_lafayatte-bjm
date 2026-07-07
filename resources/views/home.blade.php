@@ -551,9 +551,7 @@ const sectionHeight=section.clientHeight;
 
 if(pageYOffset>=sectionTop){
 
-current=section.getAttribute("id");
-
-}
+current=section.getAttribute("id"); }
 
 });
 
@@ -569,6 +567,17 @@ link.classList.add("active");
 
 });
 
+});
+
+// ==============================
+// MOBILE MENU
+// ==============================
+
+const menuToggle = document.getElementById("menuToggle");
+const navbarMenu = document.querySelector(".navbar-menu");
+
+menuToggle.addEventListener("click", () => {
+    navbarMenu.classList.toggle("active");
 });
 
 </script>
