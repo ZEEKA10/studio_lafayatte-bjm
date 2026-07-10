@@ -168,7 +168,7 @@ img{
 
     font-family:'Playfair Display',serif;
 
-    font-size:48px;
+    font-size:42px;
 
     font-weight:700;
 
@@ -189,13 +189,13 @@ img{
 
     font-family:'Montserrat',sans-serif;
 
-    font-size:15px;
+    font-size:13px;
 
     font-weight:500;
 
     color:#A8A8A8;
 
-    letter-spacing:9px;
+    letter-spacing:7px;
 
     margin-top:8px;
 
@@ -722,18 +722,15 @@ section{
 /* Checklist */
 
 .paket-card p{
-    position:relative;
-    padding-left:24px;
-    margin-bottom:14px;
-}
 
-.paket-card p::before{
-    content:"✓";
-    position:absolute;
-    left:0;
-    top:0;
-    color:var(--primary);
-    font-weight:700;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+
+    color:#666;
+    font-size:17px;
+    margin-bottom:14px;
+
 }
 
 
@@ -1689,7 +1686,7 @@ html{
 
 html,
 body{
-    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 body::-webkit-scrollbar{

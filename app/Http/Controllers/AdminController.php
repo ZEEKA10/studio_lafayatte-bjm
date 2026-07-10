@@ -8,7 +8,7 @@ use App\Models\Booking;
 use App\Exports\BookingsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Carbon\Carbon;
 
 class AdminController extends Controller {
     // Menampilkan form login
@@ -145,57 +145,116 @@ $totalBatal = Booking::where(
         return back()->with('success', 'Data booking berhasil dihapus.');
     }
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
 {
+    $periode = $request->periode;
+    $tanggal = $request->tanggal;
+
+    $bookings = Booking::with('package');
+
+    if ($periode == 'harian') {
+
+        $bookings->whereDate('tanggal', $tanggal);
+
+    } elseif ($periode == 'mingguan') {
+
+        $bookings->whereBetween('tanggal', [
+            Carbon::parse($tanggal)->startOfWeek(),
+            Carbon::parse($tanggal)->endOfWeek()
+        ]);
+
+    } elseif ($periode == 'bulanan') {
+
+        $bookings->whereMonth('tanggal', Carbon::parse($tanggal)->month)
+                 ->whereYear('tanggal', Carbon::parse($tanggal)->year);
+
+    }
+
     return Excel::download(
-        new BookingsExport,
-        'Data-Booking-Lafayette.xlsx'
+        new BookingsExport($bookings->get()),
+        'Booking-Lafayette.xlsx'
     );
 }
 
-public function exportPdf()
+public function exportPdf(Request $request)
 {
-    $bookings = Booking::with('package')
-        ->orderBy('tanggal', 'desc')
-        ->get();
+    
+    $periode = $request->periode;
+    $tanggal = $request->tanggal;
 
-    $totalBooking = Booking::count();
+    $bookings = Booking::with('package');
 
-    $totalPending = Booking::where(
-    'status',
-    'Pending'
-    )->count();
+    if ($periode == 'harian') {
 
-    $totalCheckin = Booking::where(
-    'status',
-    'Checked-in'
-    )->count();
+        $bookings->whereDate('tanggal', $tanggal);
 
-    $totalSelesai = Booking::where(
-    'status',
-    'Selesai'
-)->count();
+    } elseif ($periode == 'mingguan') {
 
-$totalBatal = Booking::where(
-    'status',
-    'Batal'
-)->count();
+        $bookings->whereBetween('tanggal', [
+            Carbon::parse($tanggal)->startOfWeek(),
+            Carbon::parse($tanggal)->endOfWeek()
+        ]);
+
+    } elseif ($periode == 'bulanan') {
+
+        $bookings->whereMonth('tanggal', Carbon::parse($tanggal)->month)
+                 ->whereYear('tanggal', Carbon::parse($tanggal)->year);
+
+    }
+
+    $bookings = $bookings->orderBy('tanggal', 'desc')->get();
+
+    $totalBooking = $bookings->count();
+
+    $totalPending = $bookings->where('status', 'Pending')->count();
+
+    $totalCheckin = $bookings->where('status', 'Checked-in')->count();
+
+    $totalSelesai = $bookings->where('status', 'Selesai')->count();
+
+    $totalBatal = $bookings->where('status', 'Batal')->count();
+
+    $periode = '';
+
+if ($request->periode == 'harian') {
+
+    $periode = \Carbon\Carbon::parse($request->tanggal)
+        ->translatedFormat('d F Y');
+
+} elseif ($request->periode == 'mingguan') {
+
+    $awal = \Carbon\Carbon::parse($request->tanggal)
+        ->startOfWeek();
+
+    $akhir = \Carbon\Carbon::parse($request->tanggal)
+        ->endOfWeek();
+
+    $periode = $awal->translatedFormat('d F Y')
+        .' - '.
+        $akhir->translatedFormat('d F Y');
+
+} else {
+
+    $periode = \Carbon\Carbon::parse($request->tanggal)
+        ->translatedFormat('F Y');
+
+}
 
     $pdf = Pdf::loadView(
         'admin.laporan_pdf',
         compact(
-        'bookings',
-        'totalBooking',
-        'totalPending',
-        'totalCheckin',
-        'totalSelesai',
-        'totalBatal'
-    )
+            'bookings',
+            'totalBooking',
+            'totalPending',
+            'totalCheckin',
+            'totalSelesai',
+            'totalBatal',
+            'periode',
+            'tanggal'
+        )
     );
 
-    return $pdf->download(
-        'Laporan-Booking-Lafayette.pdf'
-    );
+    return $pdf->download('Laporan-Booking-Lafayette.pdf');
 }
 
 }

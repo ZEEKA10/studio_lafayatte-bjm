@@ -11,24 +11,32 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class BookingsExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize
 {
+
+protected $bookings;
+
+public function __construct($bookings)
+{
+    $this->bookings = $bookings;
+}
+
     public function collection()
-    {
-        return Booking::with('package')
-            ->get()
-            ->map(function ($booking) {
+{
+    return $this->bookings->map(function ($booking) {
 
-                return [
-                    $booking->kode_booking,
-                    $booking->customer_name,
-                    $booking->no_hp,
-                    $booking->package->nama_paket ?? '-',
-                    \Carbon\Carbon::parse( $booking->tanggal )->translatedFormat('d F Y'),
-                    \Carbon\Carbon::parse( $booking->jam_mulai )->format('H:i'),
-                    $booking->status
-                ];
+        return [
 
-            });
-    }
+            $booking->kode_booking,
+            $booking->customer_name,
+            $booking->no_hp,
+            $booking->package->nama_paket ?? '-',
+            \Carbon\Carbon::parse($booking->tanggal)->translatedFormat('d F Y'),
+            \Carbon\Carbon::parse($booking->jam_mulai)->format('H:i'),
+            $booking->status
+
+        ];
+
+    });
+}
 
     public function headings(): array
     {

@@ -50,16 +50,18 @@ body{
     box-shadow:0 10px 25px rgba(138,97,65,.10);
 }
 
-.navbar-brand{
-    display:flex;
-    align-items:center;
+.navbar-custom .navbar-brand{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:flex-start;
     gap:14px;
     margin:0;
     padding:0;
     text-decoration:none;
 }
 
-.navbar-logo{
+.navbar-custom .navbar-logo{
     width:55px;
     height:55px;
     border-radius:50%;
@@ -67,9 +69,9 @@ body{
     padding:3px;
 }
 
-.judul-elegan{
+.navbar-custom .judul-elegan{
     font-family:'Playfair Display',serif;
-    font-size:1.35rem;
+    font-size:1.50rem;
     font-weight:700;
     color:#fff;
     margin:0;
@@ -418,8 +420,10 @@ body{
 
     <div class="col-lg-4 col-md-4">
 
-        <a href="{{ route('admin.exportExcel') }}"
-        class="dashboard-action excel-action text-decoration-none">
+        <a href="#"
+        class="dashboard-action excel-action text-decoration-none"
+        data-bs-toggle="modal"
+        data-bs-target="#excelModal">
 
             <div class="dashboard-icon">
                 <i class="bi bi-file-earmark-excel-fill"></i>
@@ -441,8 +445,10 @@ body{
 
     <div class="col-lg-4 col-md-4">
 
-        <a href="{{ route('admin.exportPdf') }}"
-        class="dashboard-action pdf-action text-decoration-none">
+        <a href="#"
+        class="dashboard-action pdf-action text-decoration-none"
+        data-bs-toggle="modal"
+        data-bs-target="#pdfModal">
 
             <div class="dashboard-icon">
                 <i class="bi bi-file-earmark-pdf-fill"></i>
@@ -489,7 +495,165 @@ body{
 
     </div>
 
+</div>   <!-- PENUTUP ROW EXPORT -->
+
+<!-- Modal Export Excel -->
+<div class="modal fade" id="excelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Export Excel Reservasi
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form action="{{ route('admin.exportExcel') }}" method="GET">
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Pilih Periode
+                        </label>
+
+                        <select class="form-select" id="periodeExcel" name="periode">
+
+                            <option value="harian">
+                                Harian
+                            </option>
+
+                            <option value="mingguan">
+                                Mingguan
+                            </option>
+
+                            <option value="bulanan">
+                                Bulanan
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+
+                            Tanggal
+
+                        </label>
+
+                        <input type="date" class="form-control"id="tanggalExcel"name="tanggal">
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100">
+
+                        <i class="bi bi-download me-2"></i>
+
+                        Download Excel
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
 </div>
+
+<!-- Modal Export PDF -->
+<div class="modal fade" id="pdfModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Export PDF Reservasi
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form action="{{ route('admin.exportPdf') }}" method="GET">
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Pilih Periode
+                        </label>
+
+                        <select class="form-select" id="periodePdf" name="periode">
+
+                            <option value="harian">
+                                Harian
+                            </option>
+
+                            <option value="mingguan">
+                                Mingguan
+                            </option>
+
+                            <option value="bulanan">
+                                Bulanan
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Tanggal
+                        </label>
+
+                        <input
+                        type="date"
+                        class="form-control"
+                        id="tanggalPdf"
+                        name="tanggal">
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger w-100">
+
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i>
+
+                        Download PDF
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===========================
+        STATISTIK DASHBOARD
+=========================== -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col">
+        <div class="stats-card">
 
 <div class="row g-3 mb-4">
 

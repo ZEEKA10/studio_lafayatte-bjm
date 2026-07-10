@@ -73,7 +73,7 @@
     <br><br>
 
     Periode :
-    {{ now()->translatedFormat('F Y') }}
+    {{ $periode }}
 
     <br>
 
