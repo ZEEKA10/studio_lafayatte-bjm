@@ -39,8 +39,6 @@ class PackageController extends Controller
         if ($request->hasFile('gambar')) {
             $validasi['gambar'] = $request->file('gambar')->store('packages', 'public');
         }
-
-        dd($validasi);
         
         Package::create($validasi);
 

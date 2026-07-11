@@ -388,7 +388,7 @@ img{
 
     inset:0;
 
-    background:rgba(255,255,255,.12);
+    background:rgba(55,35,20,.22);
 
     backdrop-filter:blur(2px);
 
@@ -470,10 +470,19 @@ img{
 
 .hero-desc{
     max-width:540px;
+
     font-size:18px;
-    line-height:1.8;
-    color:#555;
+
+    line-height:1.9;
+
+    color:#444;;
+
+    font-weight:500;
+
     margin-bottom:24px;
+
+    text-shadow:0 1px 8px rgba(255,255,255,.65);
+
 }
 
 /* ==========================================================
@@ -677,7 +686,7 @@ section{
 
     color:var(--primary) !important;
 
-    font-size:40px;
+    font-size:26px;
 
     font-weight:700;
 

@@ -131,13 +131,15 @@
 
     color:#8A6141;
 
-    font-size:42px;
+    font-size:32px;
 
     font-weight:700;
 
-    letter-spacing:4px;
+    letter-spacing:2px;
 
     line-height:1.2;
+
+    word-break:break-word;
 
 }
         .reservation-header{ background: linear-gradient(  rgba(0,0,0,.12),  rgba(0,0,0,.12) ), linear-gradient( 135deg, #6B4324, #A67C52,  #6B4324 ); border-radius:25px; padding:22px 20px; text-align:center; color:white; margin-bottom:35px; position:relative; overflow:hidden; }
