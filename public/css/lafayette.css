@@ -1005,6 +1005,20 @@ section{
 
 }
 
+.footer-social strong{
+
+    display:block;
+    font-size:18px;
+
+}
+
+.footer-social span{
+
+    display:block;
+    font-size:16px;
+
+}
+
 .footer-social a{
 
     display:flex;
@@ -1113,6 +1127,13 @@ section{
 
 }
 
+.footer-contact span{
+
+    text-align:center;
+    width:100%;
+
+}
+
 .footer-contact i{
 
     color:#D9B58A;
@@ -1142,6 +1163,13 @@ section{
     padding:0;
 
     margin:0;
+
+}
+
+.footer-list li{
+
+    width:100%;
+    text-align:center;
 
 }
 
@@ -1439,8 +1467,11 @@ section{
     }
 
     .footer-social a{
-        width:100%;
+        width:auto;
         justify-content:center;
+        flex-direction:column;
+        text-align:center;
+        gap:8px;
     }
 
     .footer-contact{
