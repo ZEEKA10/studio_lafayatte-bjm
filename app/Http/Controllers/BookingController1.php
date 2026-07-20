@@ -231,29 +231,29 @@ class BookingController extends Controller
         ]);
 
         return back()->with([
-            'success' => true,
+    'success' => true,
 
-            'kode_booking' => $booking->kode_booking,
-            'customer_name' => $booking->customer_name,
-            'no_hp' => $booking->no_hp,
+    'kode_booking' => $booking->kode_booking,
+    'customer_name' => $booking->customer_name,
+    'no_hp' => $booking->no_hp,
 
-            'tanggal' => $booking->tanggal,
-            'jam_mulai' => $booking->jam_mulai,
-            'jam_selesai' => $booking->jam_selesai,
+    'tanggal' => $booking->tanggal,
+    'jam_mulai' => $booking->jam_mulai,
+    'jam_selesai' => $booking->jam_selesai,
 
-            'nama_paket' => $package->nama_paket,
+    'nama_paket' => $package->nama_paket,
 
-            'status' => $booking->status,
-            'status_reservasi' => $booking->status_reservasi,
-            'status_pembayaran' => $booking->status_pembayaran,
+    'status' => $booking->status,
+    'status_reservasi' => $booking->status_reservasi,
+    'status_pembayaran' => $booking->status_pembayaran,
 
-            'wajib_dp' => $booking->wajib_dp,
-            'nominal_dp' => $booking->nominal_dp,
-        ]);
-    }
+    'wajib_dp' => $booking->wajib_dp,
+    'nominal_dp' => $booking->nominal_dp,
+]);
+}
 
-        public function pembayaran($kode_booking)
-    {
+public function pembayaran($kode_booking)
+{
     $booking = Booking::where(
         'kode_booking',
         $kode_booking
@@ -263,13 +263,13 @@ class BookingController extends Controller
         'booking.pembayaran',
         compact('booking')
     );
-    }
+}
 
-    /**
-     * Mengambil daftar jam yang tersedia berdasarkan
-     * tanggal dan paket yang dipilih.
-     */
-    public function getAvailableTimes(Request $request)
+/**
+ * Mengambil daftar jam yang tersedia berdasarkan
+ * tanggal dan paket yang dipilih.
+ */
+public function getAvailableTimes(Request $request)
     {
         $validated = $request->validate([
             'tanggal' => [

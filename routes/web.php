@@ -89,3 +89,7 @@ Route::get('/cek-booking', [BookingController::class, 'cekBooking'])
 
 Route::post('/cek-booking', [BookingController::class, 'cariBooking'])
     ->name('booking.search');
+Route::get(
+    '/booking/pembayaran/{kode_booking}',
+    [BookingController::class, 'pembayaran']
+)->name('booking.pembayaran');

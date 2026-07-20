@@ -48,7 +48,6 @@ background:#fff;
 border-radius:12px;
 
 transition:.35s;
-
 }
         .btn-outline-cokelat:hover { background:#8A6141;
 
@@ -833,22 +832,61 @@ color:#fff;
 
                                 <form action="{{ route('booking.store') }}" method="POST">
                                     @csrf
-                                    <input type="hidden" name="tanggal" id="form_tanggal" required>
-                                    <input type="hidden" name="package_id" id="selected_package" required>
+                                    <input
+                                    type="hidden"
+                                    name="tanggal"
+                                    id="form_tanggal"
+                                    value="{{ old('tanggal') }}"
+                                    required
+                                    >
+                                    <input
+                                    type="hidden"
+                                    name="package_id"
+                                    id="selected_package"
+                                    value="{{ old('package_id') }}"
+                                    required
+                                    >
                                     <div class="alert mb-4 text-center" style="background-color: #F5EBE0; border: 2px solid #BA8E68; color: #4A3525;">
-                                        Jadwal Terpilih: <br>
-                                        <h5 class="fw-bold mt-2 mb-0" id="teks_jadwal_terpilih">Pilih jam di layar sebelah kiri ⬅️</h5>
-                                        <select name="jam_mulai" id="form_jam" class="form-select mt-2 d-none" required>
-                                            <option value="">-- Kosong --</option>
-                                        </select>
-                                    </div>
+    Jadwal Terpilih: <br>
 
+    <h5 class="fw-bold mt-2 mb-0" id="teks_jadwal_terpilih">
+        Pilih jam di layar sebelah kiri ⬅️
+    </h5>
 
-                                    <div class="mb-4">
-                                        <label class="form-label fw-bold text-cokelat mb-3">
+    <select
+        name="jam_mulai"
+        id="form_jam"
+        class="form-select mt-2 d-none"
+        required
+    >
+        <option value="{{ old('jam_mulai') }}" selected>
+            {{ old('jam_mulai') ?: '-- Kosong --' }}
+        </option>
+    </select>
+</div>
 
-    Pilih Paket Foto
-</label>
+<div
+    id="info-pembayaran"
+    class="alert mb-4 text-center d-none"
+    style="
+        background-color: #FFF8F0;
+        border: 2px solid #D7B899;
+        color: #4A3525;
+    "
+>
+    <div class="fw-bold mb-1">
+        Informasi Pembayaran
+    </div>
+
+    <div id="teks-dp-paket">
+        Pilih paket terlebih dahulu
+    </div>
+</div>
+
+<div class="mb-4">
+    <label class="form-label fw-bold text-cokelat mb-3">
+        Pilih Paket Foto
+    </label>
 
 <div class="row g-2 justify-content-center nav nav-pills">
 
@@ -943,8 +981,15 @@ color:#fff;
 
         <div class="col-md-6 mb-4">
 
-            <div class="card paket-card h-100 shadow-sm"
-                 onclick="pilihPaket(this, '{{ $item->id }}')">
+            <div
+            class="card paket-card h-100 shadow-sm"
+            onclick="pilihPaket(this, '{{ $item->id }}')"
+
+            data-nama-paket="{{ $item->nama_paket }}"
+            data-wajib-dp="{{ $item->wajib_dp ? 1 : 0 }}"
+            data-nominal-dp="{{ $item->nominal_dp }}"
+            data-durasi-menit="{{ $item->jumlah_slot * 30 }}"
+            >
 
                 @if($item->gambar)
                     <img src="{{ asset('storage/'.$item->gambar) }}"
@@ -997,23 +1042,47 @@ color:#fff;
 </div>
 
                                         <div class="mb-4">
-                                        <label class="form-label fw-bold text-cokelat">Nama Lengkap</label>
-                                        <input type="text" name="customer_name" class="form-control" placeholder="Masukkan nama Anda" required>
-                                    </div>
+    <label class="form-label fw-bold text-cokelat">
+        Nama Lengkap
+    </label>
+
+    <input
+        type="text"
+        name="customer_name"
+        class="form-control"
+        placeholder="Masukkan nama Anda"
+        value="{{ old('customer_name') }}"
+        required
+    >
+</div>
 
                                     <div class="mb-4">
-                                        <label class="form-label fw-bold text-cokelat">Nomor HP (WhatsApp)</label>
-                                        <input type="text" name="no_hp" class="form-control" placeholder="Contoh: 08123456789" required>
-                                    </div>
+    <label class="form-label fw-bold text-cokelat">
+        Nomor HP (WhatsApp)
+    </label>
 
-                                    <div class="mb-4">
-                                        <label class="form-label fw-bold text-cokelat">Uang Muka (DP)</label>
-                                        <input type="text" name="no_hp" class="form-control" placeholder="Min. Rp. 50.0000" required>
-                                    </div>
+    <input
+        type="text"
+        name="no_hp"
+        class="form-control"
+        placeholder="Contoh: 08123456789"
+        value="{{ old('no_hp') }}"
+        required
+    >
+</div>
 
-                                    <div class="d-grid gap-2 mt-4 pt-2 border-top" style="border-color: #F5EBE0 !important;">
-                                        <button type="submit" id="btnSubmit" class="btn btn-cokelat btn-lg fw-bold judul-elegan py-3">Konfirmasi Pesanan</button>
-                                    </div>
+<div class="d-grid gap-2 mt-4 pt-2 border-top"
+     style="border-color: #F5EBE0 !important;">
+
+    <button
+        type="submit"
+        id="btnSubmit"
+        class="btn btn-cokelat btn-lg fw-bold judul-elegan py-3"
+    >
+        Konfirmasi Pesanan
+    </button>
+</div>
+
                                 </form>
 
             </div> <!-- card-body -->
@@ -1024,135 +1093,358 @@ color:#fff;
 
 @endif
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        
-            const monitorTanggal = document.getElementById('monitor_tanggal');
-            const formTanggal = document.getElementById('form_tanggal');
-            
-            if (monitorTanggal && formTanggal) {
-                const formJam = document.getElementById('form_jam');
-                const teksTerpilih = document.getElementById('teks_jadwal_terpilih');
-                const jadwalDisplay = document.getElementById('jadwal-display');
-                let selectedJam = ''; 
+    <script>    
+    document.addEventListener('DOMContentLoaded', function () {
 
-                function loadJadwal(tanggal, isBackgroundRefresh = false) {
-                    formTanggal.value = tanggal; 
-                    
-                    if (!isBackgroundRefresh) {
-                        selectedJam = '';
-                        formJam.innerHTML = '<option value="">-- Kosong --</option>';
-                        teksTerpilih.innerHTML = 'Pilih jadwal yang tersedia';
-                        teksTerpilih.classList.remove('text-success', 'text-danger');
-                        jadwalDisplay.innerHTML = '<div class="text-muted mt-5">⏳ Memperbarui jadwal studio...</div>';
+    const monitorTanggal = document.getElementById('monitor_tanggal');
+    const formTanggal = document.getElementById('form_tanggal');
+    const selectedPackageInput = document.getElementById('selected_package');
+
+    if (!monitorTanggal || !formTanggal) {
+        return;
+    }
+
+    const formJam = document.getElementById('form_jam');
+    const teksTerpilih = document.getElementById('teks_jadwal_terpilih');
+    const jadwalDisplay =
+    document.getElementById('jadwal-display');
+
+const infoPembayaran =
+    document.getElementById('info-pembayaran');
+
+const teksDpPaket =
+    document.getElementById('teks-dp-paket');
+
+    let selectedJam = '';
+
+    function resetPilihanJam() {
+        selectedJam = '';
+
+        formJam.innerHTML =
+            '<option value="">-- Pilih jam --</option>';
+
+        teksTerpilih.innerHTML =
+            'Pilih paket dan jadwal yang tersedia';
+
+        teksTerpilih.classList.remove(
+            'text-success',
+            'text-danger'
+        );
+    }
+
+    function loadJadwal(
+        tanggal,
+        isBackgroundRefresh = false
+    ) {
+        formTanggal.value = tanggal;
+
+        const packageId = selectedPackageInput
+            ? selectedPackageInput.value
+            : '';
+
+        /*
+         * Jangan mengambil jadwal sebelum paket dipilih.
+         */
+        if (!packageId) {
+            if (!isBackgroundRefresh) {
+                resetPilihanJam();
+
+                jadwalDisplay.innerHTML = `
+                    <div class="text-muted mt-5">
+                        Silakan pilih paket terlebih dahulu.
+                    </div>
+                `;
+            }
+
+            return;
+        }
+
+        if (!isBackgroundRefresh) {
+            resetPilihanJam();
+
+            jadwalDisplay.innerHTML = `
+                <div class="text-muted mt-5">
+                    ⏳ Memperbarui jadwal studio...
+                </div>
+            `;
+        }
+
+        const url =
+            `/booking/get-available-times` +
+            `?tanggal=${encodeURIComponent(tanggal)}` +
+            `&package_id=${encodeURIComponent(packageId)}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(
+                        'Gagal mengambil jadwal.'
+                    );
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                let gridHtml = `
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                `;
+
+                let selectedJamMasihTersedia = false;
+
+                data.detail.forEach(item => {
+                    const isTersedia =
+                        item.status === 'Tersedia';
+
+                    let badgeClass = isTersedia
+                        ? 'jadwal-tersedia'
+                        : 'jadwal-penuh';
+
+                    const sisaTeks = isTersedia
+                        ? '🟢 Tersedia'
+                        : '🔴 Penuh';
+
+                    if (
+                        item.jam === selectedJam &&
+                        isTersedia
+                    ) {
+                        badgeClass += ' jadwal-selected';
+                        selectedJamMasihTersedia = true;
                     }
 
-                    fetch(`/booking/get-available-times?tanggal=${tanggal}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            let gridHtml = `<div class="d-flex flex-wrap gap-2 justify-content-center">`;
-                            let isSelectedJamStillAvailable = false;
-                            
-                            data.detail.forEach(item => {
-                                let isTersedia = item.status === 'Tersedia';
-                                let badgeClass = item.sisa > 0
-                                    ? 'jadwal-tersedia'
-                                    : 'jadwal-penuh';
+                    const actionClick = isTersedia
+                        ? `onclick="pilihJam(this, '${item.jam}', '${item.jam_selesai}')"`
+                        : '';
 
-                                let sisaTeks = item.sisa > 0
-                                ? '🟢 Tersedia'
-                                : '🔴 Penuh';
-                                
-                                if (item.jam === selectedJam) {
-                                    if (isTersedia) {
-                                        badgeClass += ' jadwal-selected';
-                                        isSelectedJamStillAvailable = true;
-                                    }
-                                }
+                    gridHtml += `
+                        <div
+                            class="jadwal-badge ${badgeClass}"
+                            ${actionClick}
+                            id="jam-${item.jam.replace(':', '')}"
+                        >
+                            <span class="fs-6">
+                                ${item.jam}
+                            </span>
 
-                                let actionClick = isTersedia ? `onclick="pilihJam(this, '${item.jam}')"` : '';
-
-                                gridHtml += `
-                                    <div class="jadwal-badge ${badgeClass}" ${actionClick} id="jam-${item.jam.replace(':','')}">
-                                        <span class="fs-6">${item.jam}</span>
-                                        <span class="sisa-text">${sisaTeks}</span>
-                                    </div>
-                                `;
-                            });
-                            
-                            gridHtml += `</div>`;
-                            jadwalDisplay.innerHTML = gridHtml;
-
-                            if (selectedJam !== '' && !isSelectedJamStillAvailable) {
-                                selectedJam = '';
-                                formJam.innerHTML = '<option value="">-- Kosong --</option>';
-                                teksTerpilih.innerHTML = 'Maaf, jadwal yang dipilih sudah tidak tersedia. Silakan pilih jam lain.';
-                                teksTerpilih.classList.remove('text-success');
-                                teksTerpilih.classList.add('text-danger');
-                            }
-                        })
-                        .catch(error => {
-                            if (!isBackgroundRefresh) {
-                                jadwalDisplay.innerHTML = '<div class="text-danger mt-5">⚠️ Jadwal tidak dapat dimuat. Silakan muat ulang halaman.</div>';
-                            }
-                        });
-                }
-
-                loadJadwal(monitorTanggal.value);
-
-                monitorTanggal.addEventListener('change', function() {
-                    loadJadwal(this.value, false);
+                            <span class="sisa-text">
+                                ${sisaTeks}
+                            </span>
+                        </div>
+                    `;
                 });
 
-                setInterval(() => {
-                loadJadwal(monitorTanggal.value, true);
-                }, 15000);
+                gridHtml += '</div>';
 
-                window.pilihPaket = function(card, id) {
+                jadwalDisplay.innerHTML = gridHtml;
 
-                    document.querySelectorAll('.paket-card').forEach(el => {
-                        el.classList.remove('border', 'border-3', 'border-success');
-                    });
+                if (
+                    selectedJam !== '' &&
+                    !selectedJamMasihTersedia
+                ) {
+                    resetPilihanJam();
 
-                    card.classList.add('border', 'border-3', 'border-success');
+                    teksTerpilih.innerHTML =
+                        'Maaf, jadwal yang dipilih sudah tidak tersedia. Silakan pilih jam lain.';
 
-                    document.getElementById('selected_package').value = id;
+                    teksTerpilih.classList.add(
+                        'text-danger'
+                    );
                 }
-
-                window.pilihJam = function(element, jam) {
-
-    document.querySelectorAll('.jadwal-badge').forEach(el => {
-        el.classList.remove('jadwal-selected');
-    });
-
-    element.classList.add('jadwal-selected');
-    selectedJam = jam;
-
-    formJam.innerHTML = `<option value="${jam}" selected>${jam}</option>`;
-
-    // Format tanggal Indonesia
-    const tanggal = new Date(formTanggal.value);
-
-    const formatTanggal = tanggal.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-
-    teksTerpilih.innerHTML = `
-        <i class="bi bi-calendar-event me-2"></i>${formatTanggal}
-        &nbsp;&nbsp;
-        <i class="bi bi-clock me-2"></i>${jam} WITA
-    `;
-
-    teksTerpilih.classList.remove('text-danger');
-    teksTerpilih.classList.add('text-success');
+            })
+            .catch(() => {
+                if (!isBackgroundRefresh) {
+                    jadwalDisplay.innerHTML = `
+                        <div class="text-danger mt-5">
+                            ⚠️ Jadwal tidak dapat dimuat.
+                            Silakan muat ulang halaman.
+                        </div>
+                    `;
+                }
+            });
     }
-            }
-        });
-    </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    /*
+     * Saat tanggal berubah, muat ulang jadwal.
+     */
+    monitorTanggal.addEventListener(
+        'change',
+        function () {
+            loadJadwal(this.value, false);
+        }
+    );
+
+    /*
+     * Refresh jadwal setiap 15 detik.
+     */
+    setInterval(function () {
+        const packageId = selectedPackageInput
+            ? selectedPackageInput.value
+            : '';
+
+        if (
+            monitorTanggal.value &&
+            packageId
+        ) {
+            loadJadwal(
+                monitorTanggal.value,
+                true
+            );
+        }
+    }, 15000);
+
+    /*
+     * Saat paket dipilih.
+     */
+    window.pilihPaket = function (card, id) {
+
+    document
+        .querySelectorAll('.paket-card')
+        .forEach(function (item) {
+            item.classList.remove('paket-selected');
+        });
+
+    card.classList.add('paket-selected');
+
+    selectedPackageInput.value = id;
+
+    // Ambil data dari kartu paket
+    const namaPaket = card.dataset.namaPaket;
+    const wajibDp = card.dataset.wajibDp === '1';
+    const nominalDp = Number(card.dataset.nominalDp || 0);
+    const durasiMenit = card.dataset.durasiMenit;
+
+    // Tampilkan panel informasi pembayaran
+    infoPembayaran.classList.remove('d-none');
+
+    if (wajibDp) {
+        const nominalFormat =
+            new Intl.NumberFormat('id-ID').format(nominalDp);
+
+        teksDpPaket.innerHTML = `
+    <div><strong>${namaPaket}</strong></div>
+
+    <div>Durasi : ${durasiMenit} menit</div>
+
+    <div class="fw-bold text-success mb-2">
+        DP yang harus dibayar: Rp ${nominalFormat}
+    </div>
+
+    <small class="text-muted">
+        Setelah booking berhasil dibuat, Anda akan diarahkan ke halaman
+        pembayaran untuk melihat QRIS dan mengunggah bukti transfer.
+    </small>
+    `;
+    } else {
+        teksDpPaket.innerHTML = `
+    <div><strong>${namaPaket}</strong></div>
+
+    <div>Durasi : ${durasiMenit} menit</div>
+
+    <div class="fw-bold text-success mb-2">
+        Paket ini tidak memerlukan DP
+    </div>
+
+    <small class="text-muted">
+        Booking dapat langsung diproses setelah data berhasil dikirim.
+    </small>
+    `;
+    }
+
+    resetPilihanJam();
+
+    loadJadwal(
+        monitorTanggal.value,
+        false
+    );
+};
+
+    /*
+     * Saat jam dipilih.
+     */
+    window.pilihJam = function (
+        element,
+        jam,
+        jamSelesai
+    ) {
+        document
+            .querySelectorAll('.jadwal-badge')
+            .forEach(function (item) {
+                item.classList.remove(
+                    'jadwal-selected'
+                );
+            });
+
+        element.classList.add(
+            'jadwal-selected'
+        );
+
+        selectedJam = jam;
+
+        formJam.innerHTML = `
+            <option value="${jam}" selected>
+                ${jam}
+            </option>
+        `;
+
+        const bagianTanggal =
+            formTanggal.value.split('-');
+
+        const tanggal = new Date(
+            bagianTanggal[0],
+            bagianTanggal[1] - 1,
+            bagianTanggal[2]
+        );
+
+        const formatTanggal =
+            tanggal.toLocaleDateString(
+                'id-ID',
+                {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }
+            );
+
+        teksTerpilih.innerHTML = `
+            <i class="bi bi-calendar-event me-2"></i>
+            ${formatTanggal}
+
+            &nbsp;&nbsp;
+
+            <i class="bi bi-clock me-2"></i>
+            ${jam}–${jamSelesai} WITA
+        `;
+
+        teksTerpilih.classList.remove(
+            'text-danger'
+        );
+
+        teksTerpilih.classList.add(
+            'text-success'
+        );
+    };
+
+    /*
+     * Tampilan awal.
+     */
+    if (
+        selectedPackageInput &&
+        selectedPackageInput.value
+    ) {
+        loadJadwal(
+            monitorTanggal.value,
+            false
+        );
+    } else {
+        jadwalDisplay.innerHTML = `
+            <div class="text-muted mt-5">
+                Silakan pilih paket terlebih dahulu.
+            </div>
+        `;
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
