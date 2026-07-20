@@ -696,17 +696,6 @@ body{
             <small>Selesai</small>
         </div>
     </div>
-
-    <div class="col">
-        <div class="stats-card">
-            <div class="stats-icon bg-danger-soft">
-                <i class="bi bi-x-circle-fill"></i>
-            </div>
-            <h3>{{ $totalBatal }}</h3>
-            <small>Ditolak</small>
-        </div>
-    </div>
-
 </div>
 
         <form method="GET"
@@ -765,12 +754,6 @@ body{
                     {{ request('status')=='Selesai' ? 'selected' : '' }}>
                     Selesai
                 </option>
-
-                <option value="Batal"
-                    {{ request('status')=='Batal' ? 'selected' : '' }}>
-                    Ditolak
-                </option>
-
             </select>
 
         </div>
@@ -877,13 +860,6 @@ body{
                                             @csrf
                                             <input type="hidden" name="status" value="Selesai">
                                             <button type="submit" class="btn-aksi btn-aksi-selesai" title="Tandai Selesai">✔️</button>
-                                        </form>
-
-                                        <!-- Tombol Aksi Batal -->
-                                        <form action="{{ route('admin.updateStatus', $booking->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="status" value="Batal">
-                                            <button type="submit" class="btn-aksi btn-aksi-batal" title="Batalkan">❌</button>
                                         </form>
 
                                         <!-- Tombol Aksi Hapus -->

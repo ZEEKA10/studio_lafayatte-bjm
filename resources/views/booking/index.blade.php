@@ -1006,6 +1006,11 @@ color:#fff;
                                         <input type="text" name="no_hp" class="form-control" placeholder="Contoh: 08123456789" required>
                                     </div>
 
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold text-cokelat">Uang Muka (DP)</label>
+                                        <input type="text" name="no_hp" class="form-control" placeholder="Min. Rp. 50.0000" required>
+                                    </div>
+
                                     <div class="d-grid gap-2 mt-4 pt-2 border-top" style="border-color: #F5EBE0 !important;">
                                         <button type="submit" id="btnSubmit" class="btn btn-cokelat btn-lg fw-bold judul-elegan py-3">Konfirmasi Pesanan</button>
                                     </div>

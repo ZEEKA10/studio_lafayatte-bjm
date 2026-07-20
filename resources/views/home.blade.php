@@ -177,7 +177,7 @@
                     @if(trim($item) != '')
                         <p>
                             <i class="bi bi-check-lg me-2"></i>
-                            {{ preg_replace('/^[^\p{L}\p{N}]+/u', '', trim($item)) }}
+                            {{ ltrim(trim($item), "✓✔•- ") }}
                         </p>
                     @endif
 
