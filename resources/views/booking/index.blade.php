@@ -69,6 +69,19 @@ color:#fff;
         .jadwal-tersedia:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(46, 125, 50, 0.15); background-color: #E8F5E9; }
         .jadwal-selected { background-color: #BA8E68 !important; color: #FFFFFF !important; border-color: #8A6141 !important; transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 20px rgba(138, 97, 65, 0.3); }
         .jadwal-penuh { background-color: #FFEBEE; color: #C62828; border: 2px solid #FFCDD2; opacity: 0.6; text-decoration: line-through; cursor: not-allowed; }
+        .jadwal-lewat {
+    background-color: #F5F5F5;
+    color: #757575;
+    border: 2px solid #D6D6D6;
+    opacity: 0.8;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+.jadwal-lewat:hover {
+    transform: none;
+    box-shadow: none;
+}
         .sisa-text { display:block; margin-top:6px; font-size:12px; font-weight:600; letter-spacing:.3px; }
 
         .pass-header{ margin-bottom:10px; }
@@ -113,8 +126,8 @@ color:#fff;
     box-shadow:0 15px 30px rgba(0,0,0,0.15);
 }
 
-.paket-card.selected{
-    border:3px solid #BA8E68;
+.paket-card.paket-selected{
+    border:3px solid #198754;
 }
 
 .paket-card img{
@@ -317,23 +330,28 @@ color:#fff;
 
 .status-icon{
 
-    width:80px;
-    height:80px;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 18px;
 
-    margin:0 auto 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #f8efe7, #ead6c3);
 
-    background:#F5EBE0;
-    border-radius:18px;
+    color: #8b5e3c;
 
-    font-size:36px;
-    color:#9B6E45;
-
+    box-shadow:
+        0 10px 24px rgba(92, 61, 39, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
+.status-icon i {
+    font-size: 32px;
+    line-height: 1;
+}
 
 .status-title{
 
@@ -398,6 +416,82 @@ color:#fff;
 
 }
 
+.upload-payment-card {
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.upload-payment-card .payment-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5e9dc;
+    color: #94643f;
+    font-size: 24px;
+}
+
+.upload-file-input {
+    min-height: 52px;
+    border: 1px solid #d8b99d;
+    border-radius: 12px;
+}
+
+.upload-file-input:focus {
+    border-color: #94643f;
+    box-shadow: 0 0 0 0.2rem rgba(148, 100, 63, 0.15);
+}
+
+.upload-submit-button {
+    min-height: 54px;
+    min-width: 330px;
+    max-width: 380px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+@media (max-width: 767.98px) {
+    .upload-payment-card {
+        border-radius: 18px;
+    }
+
+    .upload-payment-card .card-body {
+        padding: 22px 16px !important;
+    }
+
+    .upload-payment-card .payment-title {
+        font-size: 1.55rem;
+    }
+
+    .upload-payment-card .payment-text {
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+
+    .upload-file-input {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .upload-submit-button {
+    width: 100%;
+    max-width: none;
+    min-width: auto;
+    font-size: 1rem;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    }
+}
+
+.upload-payment-card{
+    max-width: 900px;
+    width: 100%;
+    margin: 55px auto 45px auto;
+    border-radius: 25px;
+    overflow: hidden;
+}
 
     </style>
 </head>
@@ -615,11 +709,25 @@ color:#fff;
     </small>
 
     <h4 class="payment-title">
-     Pembayaran di Studio
+    DP Pembayaran
     </h4>
 
     <p class="payment-text">
-     Pembayaran dapat dilakukan langsung pada hari pemotretan sebelum sesi dimulai.
+        @if(session('wajib_dp'))
+
+        DP yang harus dibayar:
+
+        <br><br>
+
+        <strong class="fs-4">
+            Rp {{ number_format(session('nominal_dp'),0,',','.') }}
+        </strong>
+
+    @else
+
+        Paket ini tidak memerlukan DP.
+
+    @endif
     </p>
     </div>
 </div>
@@ -640,12 +748,35 @@ color:#fff;
         </small>
 
         <h4 class="payment-title">
-            Hubungi Admin
-        </h4>
+    Bayar melalui QRIS
+</h4>
 
-        <p class="payment-text">
-        Untuk pembayaran melalui transfer bank maupun e-wallet, silakan hubungi admin Lafayette Photo Studio melalui WhatsApp untuk mendapatkan informasi pembayaran.
-        </p>
+<p class="payment-text">
+    @if(session('wajib_dp'))
+
+        Silakan scan QRIS di bawah ini dan lakukan pembayaran sesuai nominal DP.
+
+        <br><br>
+
+        <img
+            src="{{ asset('images/qris-lafayette.png') }}"
+            alt="QRIS Lafayette Photo Studio"
+            class="img-fluid rounded shadow-sm"
+            style="max-width: 230px;"
+        >
+
+        <br><br>
+
+        <small class="text-muted">
+            Pastikan nominal pembayaran sesuai sebelum mengirim bukti pembayaran.
+        </small>
+
+    @else
+
+        Paket ini tidak memerlukan pembayaran DP.
+
+    @endif
+    </p>
 
     </div>
 </div>
@@ -653,107 +784,126 @@ color:#fff;
 </div>
         </div>
         
-            <div class="status-booking-card mb-4">
+        @if(session('wajib_dp') && session('status_reservasi') === 'menunggu_pembayaran'
+    )
 
-    <div class="status-icon">
+    <div class="card border-0 shadow-sm mt-5 mb-5 mx-auto upload-payment-card">
+        <div class="card-body p-3 p-md-4 p-lg-5">
 
-        <i class="bi bi-hourglass-split"></i>
+            <div class="text-center mb-4">
 
+                <div class="payment-icon mx-auto mb-3">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                </div>
+
+                <small class="payment-label">
+                    UPLOAD PEMBAYARAN
+                </small>
+
+                <h4 class="payment-title mt-2">
+                    Upload Bukti DP
+                </h4>
+
+                <p class="payment-text mb-0">
+                    Upload bukti pembayaran setelah melakukan pembayaran DP melalui QRIS.
+                </p>
+
+            </div>
+
+            @if(session('upload_success'))
+                <div class="alert alert-success text-center">
+                    {{ session('upload_success') }}
+                </div>
+            @endif
+
+            @if($errors->has('bukti_pembayaran'))
+                <div class="alert alert-danger text-center">
+                    {{ $errors->first('bukti_pembayaran') }}
+                </div>
+            @endif
+
+            <form
+                action="{{ route(
+                    'booking.upload-bukti',
+                    session('kode_booking')
+                ) }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+                @csrf
+
+                <div class="mb-4">
+
+                    <label
+                        for="bukti_pembayaran"
+                        class="form-label fw-bold text-cokelat"
+                    >
+                        Pilih Bukti Pembayaran
+                    </label>
+
+                    <input
+                        type="file"
+                        name="bukti_pembayaran"
+                        id="bukti_pembayaran"
+                        class="form-control upload-file-input"
+                        accept=".jpg,.jpeg,.png"
+                        required
+                    >
+
+                    <small class="text-muted d-block mt-2">
+                        Format JPG, JPEG, atau PNG. Maksimal 2 MB.
+                    </small>
+
+                </div>
+
+                <div class="d-grid d-md-flex justify-content-md-center">
+
+                    <button
+                        type="submit"
+                        class="btn btn-cokelat btn-lg px-md-5 upload-submit-button"
+                    >
+                        <i class="bi bi-cloud-arrow-up me-2"></i>
+                        Kirim Bukti Pembayaran
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
     </div>
 
-    <h4 class="status-title">
-        Status Reservasi
-    </h4>
+@endif
 
-    <div class="text-center mb-4">
+@if( session('wajib_dp') && session('status_reservasi') === 'menunggu_verifikasi')
 
-    <span class="status-badge pending">
+    <div class="card border-0 shadow-sm mt-5 mb-5 mx-auto upload-payment-card">
+        <div class="card-body p-3 p-md-4 p-lg-5 text-center">
 
-        Pending Konfirmasi
+            <div class="payment-icon mx-auto mb-3">
+                <i class="bi bi-shield-check"></i>
+            </div>
 
-    </span>
+            <small class="payment-label">
+                VERIFIKASI PEMBAYARAN
+            </small>
 
+            <h4 class="payment-title mt-2">
+                Bukti Pembayaran Sudah Dikirim
+            </h4>
+
+            <p class="payment-text mb-0">
+                Bukti pembayaran DP sedang diperiksa oleh admin.
+                Anda tidak perlu mengunggah bukti pembayaran kembali.
+            </p>
+
+        </div>
     </div>
 
-    <div class="status-desc">
-
-    <p>
-        Reservasi Anda telah berhasil dikirim dan sedang menunggu proses
-        verifikasi oleh <strong>Admin Lafayette Photo Studio</strong>.
-    </p>
-
-    <p>
-        Status reservasi dapat berubah menjadi
-        <strong>Disetujui</strong> atau
-        <strong>Ditolak</strong>
-        setelah dilakukan pemeriksaan jadwal.
-    </p>
-
-    <p>
-        Silakan lakukan pengecekan status secara berkala melalui menu
-        <strong>Cek Booking</strong>.
-    </p>
-
-    <p>
-        Apabila reservasi telah disetujui, Anda dapat mengunduh
-        <strong>Check-in Pass</strong>
-        sebagai bukti masuk ke studio.
-    </p>
-
-</div>
-
-            <div class="text-center mt-5">
-
-    <!-- Tombol Utama -->
-    <div class="mb-3">
-
-        <a href="{{ route('booking.pdf', session('kode_booking')) }}"
-           class="btn btn-success btn-lg px-3">
-
-            <i class="bi bi-file-earmark-pdf me-2"></i>
-            Download Bukti Reservasi
-
-        </a>
-
-    </div>
-
-    <!-- Tombol Pendukung -->
-    <div class="d-flex justify-content-center gap-3 mb-3">
-
-        <a href="https://wa.me/6285216962962?text=Halo%20Admin%20Lafayette%20Photo%20Studio,%20saya%20ingin%20memperoleh%20informasi%20pembayaran%20melalui%20transfer%20bank%20atau%20e-wallet%20untuk%20reservasi%20saya."
-           target="_blank"
-           class="btn btn-cokelat btn-lg px-3">
-
-            Hubungi Admin
-
-        </a>
-
-        <a href="{{ route('booking.check') }}"
-           class="btn btn-outline-cokelat btn-lg px-3">
-
-            <i class="bi bi-search me-2"></i>
-            Lihat Status Booking
-
-        </a>
-
-    </div>
-
-    <!-- Tombol Bawah -->
-    <div>
-
-        <a href="{{ url('/') }}"
-           class="btn btn-outline-cokelat btn-lg px-3">
-
-            <i class="bi bi-house-door me-2"></i>
-            Kembali ke Beranda
-
-        </a>
-
-    </div>
-
-</div>
+@endif
 
 @else
+
                         
             <div class="row">
                     <div class="col-lg-4 mb-4 animasi-masuk" style="animation-delay: 0.1s;">
@@ -761,9 +911,20 @@ color:#fff;
                             <div class="card-header bg-cokelat text-center py-3 card-header-custom text-white">
                                 <h4 class="mb-0 judul-elegan fs-4 fw-bold"><i class="bi bi-calendar2-week me-2"></i>Monitor Jadwal Studio<span class="badge bg-danger ms-2 shadow-sm" style="font-size: 0.6rem; vertical-align: middle; animation: textPulse 2s infinite;">LIVE</span></h4>
                             </div>
-                            <div class="card-body p-4">
-                                <label class="form-label fw-bold text-cokelat">1. Pilih Tanggal Pemotretan:</label>
-                                <input type="date" id="monitor_tanggal" class="form-control mb-4" style="border: 2px solid #BA8E68;" value="{{ date('Y-m-d') }}">
+    <div class="card-body p-4">
+    <label class="form-label fw-bold text-cokelat">
+        2. Pilih Tanggal Pemotretan :
+    </label>
+
+    <input
+        type="date"
+        id="monitor_tanggal"
+        class="form-control mb-4"
+        style="border: 2px solid #BA8E68;"
+        min="{{ now('Asia/Makassar')->format('Y-m-d') }}"
+        value="{{ now('Asia/Makassar')->format('Y-m-d') }}"
+        disabled
+    >
 
                                 
 <div class="studio-info">
@@ -830,15 +991,20 @@ color:#fff;
                                     </div>
                                 @endif
 
-                                <form action="{{ route('booking.store') }}" method="POST">
+                                <form
+                                    action="{{ route('booking.store') }}"
+                                    method="POST"
+                                    id="formBooking"
+                                    >
                                     @csrf
                                     <input
-                                    type="hidden"
-                                    name="tanggal"
-                                    id="form_tanggal"
-                                    value="{{ old('tanggal') }}"
-                                    required
-                                    >
+    type="date"
+    id="monitor_tanggal"
+    class="form-control mb-4"
+    style="border: 2px solid #BA8E68;"
+    min="{{ now('Asia/Makassar')->format('Y-m-d') }}"
+    value="{{ old('tanggal', now('Asia/Makassar')->format('Y-m-d')) }}"
+>
                                     <input
                                     type="hidden"
                                     name="package_id"
@@ -885,7 +1051,7 @@ color:#fff;
 
 <div class="mb-4">
     <label class="form-label fw-bold text-cokelat mb-3">
-        Pilih Paket Foto
+        1. Pilih Paket Foto
     </label>
 
 <div class="row g-2 justify-content-center nav nav-pills">
@@ -1075,15 +1241,143 @@ color:#fff;
      style="border-color: #F5EBE0 !important;">
 
     <button
-        type="submit"
-        id="btnSubmit"
-        class="btn btn-cokelat btn-lg fw-bold judul-elegan py-3"
+    type="button"
+    id="btnBukaKonfirmasi"
+    class="btn btn-cokelat btn-lg fw-bold judul-elegan py-3"
     >
-        Konfirmasi Pesanan
-    </button>
+    <i class="bi bi-check-circle me-2"></i>
+    Konfirmasi Pesanan
+</button>
 </div>
 
                                 </form>
+
+                <div
+    class="modal fade"
+    id="modalKonfirmasiBooking"
+    tabindex="-1"
+    aria-labelledby="modalKonfirmasiBookingLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+
+        <div class="modal-content border-0 shadow-lg modal-konfirmasi">
+
+            <div class="modal-header border-0 pb-0">
+
+                <div class="w-100 text-center">
+
+                    <div class="modal-icon mx-auto mb-3">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+
+                    <h3
+                        class="modal-title judul-elegan text-cokelat"
+                        id="modalKonfirmasiBookingLabel"
+                    >
+                        Konfirmasi Reservasi
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Periksa kembali data reservasi sebelum dikirim.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close position-absolute top-0 end-0 m-3"
+                    data-bs-dismiss="modal"
+                    aria-label="Tutup"
+                ></button>
+
+            </div>
+
+            <div class="modal-body px-4 px-md-5 py-4">
+
+                <div class="ringkasan-booking">
+
+                    <div class="ringkasan-item">
+                        <span>Paket Foto</span>
+                        <strong id="konfirmasiPaket">-</strong>
+                    </div>
+
+                    <div class="ringkasan-item">
+                        <span>Tanggal</span>
+                        <strong id="konfirmasiTanggal">-</strong>
+                    </div>
+
+                    <div class="ringkasan-item">
+                        <span>Jam</span>
+                        <strong id="konfirmasiJam">-</strong>
+                    </div>
+
+                    <div class="ringkasan-item">
+                        <span>Nama Customer</span>
+                        <strong id="konfirmasiNama">-</strong>
+                    </div>
+
+                    <div class="ringkasan-item">
+                        <span>Nomor WhatsApp</span>
+                        <strong id="konfirmasiNoHp">-</strong>
+                    </div>
+
+                    <div class="ringkasan-item">
+                        <span>Nominal DP</span>
+                        <strong id="konfirmasiDp">-</strong>
+                    </div>
+
+                </div>
+
+                <div class="alert alert-warning mt-4 mb-0">
+
+                    <div class="fw-bold mb-2">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Pastikan seluruh data sudah benar
+                    </div>
+
+                    <ul class="mb-0 ps-3">
+                        <li>
+                            Jadwal akan langsung dicatat setelah reservasi dikirim.
+                        </li>
+                        <li>
+                            Customer bersedia melakukan pembayaran DP sesuai ketentuan.
+                        </li>
+                        <li>
+                            QRIS EDC terbaru akan diminta melalui WhatsApp admin.
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer border-0 px-4 px-md-5 pb-4">
+
+                <button
+                    type="button"
+                    class="btn btn-outline-cokelat flex-fill py-3"
+                    data-bs-dismiss="modal"
+                >
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Periksa Kembali
+                </button>
+
+                <button
+                    type="button"
+                    id="btnKirimBooking"
+                    class="btn btn-cokelat flex-fill py-3"
+                >
+                    <i class="bi bi-check-circle me-2"></i>
+                    Ya, Lanjutkan
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
 
             </div> <!-- card-body -->
         </div> <!-- card -->
@@ -1192,16 +1486,38 @@ const teksDpPaket =
                 let selectedJamMasihTersedia = false;
 
                 data.detail.forEach(item => {
-                    const isTersedia =
-                        item.status === 'Tersedia';
+                    const sekarang = new Date();
 
-                    let badgeClass = isTersedia
-                        ? 'jadwal-tersedia'
-                        : 'jadwal-penuh';
+    const bagianTanggal =
+        monitorTanggal.value.split('-');
 
-                    const sisaTeks = isTersedia
-                        ? '🟢 Tersedia'
-                        : '🔴 Penuh';
+    const bagianJam =
+        item.jam.split(':');
+
+    const waktuSlot = new Date(
+        Number(bagianTanggal[0]),
+        Number(bagianTanggal[1]) - 1,
+        Number(bagianTanggal[2]),
+        Number(bagianJam[0]),
+        Number(bagianJam[1]),
+        0
+    );
+
+    if (waktuSlot <= sekarang) {
+        item.status = 'Lewat';
+    }
+
+    const isTersedia =
+        item.status === 'Tersedia';
+
+    let badgeClass = 'jadwal-penuh';
+
+    if (item.status === 'Tersedia') {
+        badgeClass = 'jadwal-tersedia';
+    } else if (item.status === 'Lewat') {
+        badgeClass = 'jadwal-lewat';
+    }
+
 
                     if (
                         item.jam === selectedJam &&
@@ -1292,8 +1608,8 @@ const teksDpPaket =
     }, 15000);
 
     /*
-     * Saat paket dipilih.
-     */
+     * Saat paket dipilih.*/
+
     window.pilihPaket = function (card, id) {
 
     document
@@ -1305,6 +1621,12 @@ const teksDpPaket =
     card.classList.add('paket-selected');
 
     selectedPackageInput.value = id;
+
+    monitorTanggal.disabled = false;
+
+    if (monitorTanggal.value) {
+        loadJadwal(monitorTanggal.value, false);
+    }
 
     // Ambil data dari kartu paket
     const namaPaket = card.dataset.namaPaket;
@@ -1329,8 +1651,7 @@ const teksDpPaket =
     </div>
 
     <small class="text-muted">
-        Setelah booking berhasil dibuat, Anda akan diarahkan ke halaman
-        pembayaran untuk melihat QRIS dan mengunggah bukti transfer.
+        Setelah booking berhasil dibuat, silakan hubungi admin melalui WhatsApp untuk mendapatkan QRIS EDC, kemudian unggah bukti pembayaran.
     </small>
     `;
     } else {
@@ -1442,6 +1763,117 @@ const teksDpPaket =
         `;
     }
 });
+
+const formBooking = document.getElementById('formBooking');
+const btnBukaKonfirmasi = document.getElementById('btnBukaKonfirmasi');
+const btnKirimBooking = document.getElementById('btnKirimBooking');
+
+if (
+    formBooking &&
+    btnBukaKonfirmasi &&
+    btnKirimBooking
+) {
+    btnBukaKonfirmasi.addEventListener('click', function () {
+
+        if (!formBooking.checkValidity()) {
+            formBooking.reportValidity();
+            return;
+        }
+
+        const packageCard = document.querySelector(
+            '.paket-card.paket-selected'
+        );
+
+        const namaPaket = packageCard
+            ? packageCard.dataset.namaPaket
+            : '-';
+
+        const wajibDp = packageCard
+            ? packageCard.dataset.wajibDp === '1'
+            : false;
+
+        const nominalDp = packageCard
+            ? Number(packageCard.dataset.nominalDp || 0)
+            : 0;
+
+        const namaCustomer =
+            formBooking.querySelector('[name="customer_name"]').value;
+
+        const noHp =
+            formBooking.querySelector('[name="no_hp"]').value;
+
+        const tanggalValue =
+            formBooking.querySelector('[name="tanggal"]').value;
+
+        const jamValue =
+            formBooking.querySelector('[name="jam_mulai"]').value;
+
+        let tanggalTampil = '-';
+
+        if (tanggalValue) {
+            const bagianTanggal = tanggalValue.split('-');
+
+            const tanggal = new Date(
+                bagianTanggal[0],
+                bagianTanggal[1] - 1,
+                bagianTanggal[2]
+            );
+
+            tanggalTampil = tanggal.toLocaleDateString(
+                'id-ID',
+                {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }
+            );
+        }
+
+        const nominalDpTampil = wajibDp
+            ? 'Rp ' + new Intl.NumberFormat('id-ID').format(nominalDp)
+            : 'Tidak ada DP';
+
+        document.getElementById('konfirmasiPaket').textContent =
+            namaPaket;
+
+        document.getElementById('konfirmasiTanggal').textContent =
+            tanggalTampil;
+
+        document.getElementById('konfirmasiJam').textContent =
+            jamValue ? jamValue + ' WITA' : '-';
+
+        document.getElementById('konfirmasiNama').textContent =
+            namaCustomer;
+
+        document.getElementById('konfirmasiNoHp').textContent =
+            noHp;
+
+        document.getElementById('konfirmasiDp').textContent =
+            nominalDpTampil;
+
+        const modalKonfirmasi = new bootstrap.Modal(
+            document.getElementById('modalKonfirmasiBooking')
+        );
+
+        modalKonfirmasi.show();
+    });
+
+    btnKirimBooking.addEventListener('click', function () {
+
+        btnKirimBooking.disabled = true;
+
+        btnKirimBooking.innerHTML = `
+            <span
+                class="spinner-border spinner-border-sm me-2"
+                aria-hidden="true"
+            ></span>
+            Memproses Reservasi...
+        `;
+
+        formBooking.submit();
+    });
+}
+
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
