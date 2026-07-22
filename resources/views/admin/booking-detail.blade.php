@@ -223,10 +223,6 @@
                                         Selesai
                                     </span>
 
-                                @elseif($booking->status_reservasi === 'kedaluwarsa')
-                                    <span class="badge bg-dark px-3 py-2">
-                                        Kedaluwarsa
-                                    </span>
 
                                 @else
                                     <span class="badge bg-light text-dark border px-3 py-2">
