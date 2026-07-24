@@ -119,7 +119,7 @@ td{
     </div>
 
     <p style="font-size:12px;color:#777;">
-        Scan QR Code ini saat check-in
+        Tunjukkan QR Check-in Pass ini kepada admin saat datang ke studio.
     </p>
 
 </div>
@@ -156,7 +156,9 @@ td{
 <tr>
     <td class="label">Tanggal</td>
     <td>
-    {{ \Carbon\Carbon::parse($booking->tanggal)->translatedFormat('d F Y') }}</td>
+    {{ \Carbon\Carbon::parse($booking->tanggal)
+    ->locale('id')
+    ->translatedFormat('d F Y') }}</td>
 </tr>
 
 <tr>
@@ -168,7 +170,7 @@ td{
     <td class="label">Status</td>
     <td>
         <span class="status">
-            {{ $booking->status }}
+            {{ ucwords(str_replace('_', ' ', $booking->status_reservasi)) }}
         </span>
     </td>
 </tr>
@@ -176,7 +178,9 @@ td{
 <tr>
     <td class="label">Dicetak Pada</td>
     <td>
-        {{ now()->format('d M Y H:i') }}
+        {{ now()
+    ->locale('id')
+    ->translatedFormat('d F Y H:i') }}
     </td>
 </tr>
 

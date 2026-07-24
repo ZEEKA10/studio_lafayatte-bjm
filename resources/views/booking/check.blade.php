@@ -322,79 +322,98 @@
 
 }
 
-.btn-action{
-
-    min-width:260px;
-
-    height:58px;
-
-    border-radius:14px;
-
-    font-weight:600;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:17px;
-
+.btn-action {
+    min-width: 210px;
+    min-height: 48px;
+    padding: 11px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    text-decoration: none;
 }
 
-.qr-wrapper{
-
-    display:inline-block;
-
-    background:#fff;
-
-    padding:18px;
-
-    border-radius:20px;
-
-    box-shadow:0 12px 30px rgba(138,97,65,.12);
-
-    border:1px solid #EFE3D8;
-
+.detail-booking-wrapper {
+    max-width: 900px;
+    margin: 35px auto 0;
 }
 
-@media(max-width:768px){
+.detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
 
-    .booking-title{
-        font-size:30px;
+.qr-locked {
+    width: 205px;
+    min-height: 205px;
+    margin: 0 auto;
+    padding: 25px 18px;
+    border: 1px dashed #d5b99f;
+    border-radius: 20px;
+    background: #faf6f2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #8a6141;
+}
+
+.qr-locked i {
+    font-size: 38px;
+    margin-bottom: 12px;
+}
+
+.qr-locked h6 {
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.qr-locked p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #78685d;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .detail-booking-wrapper {
+        margin-top: 25px;
     }
 
-    .booking-subtitle{
-        font-size:14px;
+    .booking-detail-card .card-body {
+        padding: 22px 16px !important;
     }
 
-    .booking-code{
-        font-size:28px;
+    .detail-actions {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .booking-item{
-        grid-template-columns:1fr;
-        gap:8px;
-        align-items:flex-start;
+    .btn-action {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        margin: 0;
     }
 
-    .booking-label{
-        font-size:15px;
+    .qr-wrapper,
+    .qr-locked {
+        max-width: 100%;
     }
-
-    .booking-value{
-        font-size:15px;
-        word-break:break-word;
-    }
-
-    .btn-action{
-        width:85%;
-        min-width:0;
-        height:48px;
-        font-size:15px;
-        margin:8px auto;
-    }
-
 }
 
     </style>
@@ -406,7 +425,10 @@
                         
             <div class="row">
 
-    <div class="col-lg-6 mx-auto mb-4 animasi-masuk" style="animation-delay:0.2s;">
+    <div
+    class="col-12 col-md-11 col-lg-10 col-xl-9 mx-auto mb-4 animasi-masuk"
+    style="animation-delay:0.2s;"
+    >
     <div class="card card-custom h-100">
 
         <div class="booking-hero">
@@ -523,301 +545,417 @@
 
 @if(isset($booking))
 
-<hr class="my-5">
+    @php
+        $statusReservasi = $booking->status_reservasi;
 
-<div class="card border-0 shadow-lg booking-detail-card">
+        $statusData = [
+            'menunggu_pembayaran' => [
+                'label' => 'Menunggu Pembayaran',
+                'class' => 'bg-warning text-dark',
+                'icon' => 'bi-wallet2',
+            ],
 
-    <div class="card-body p-4">
+            'menunggu_verifikasi' => [
+                'label' => 'Menunggu Verifikasi',
+                'class' => 'bg-info text-dark',
+                'icon' => 'bi-hourglass-split',
+            ],
 
-        <h3 class="judul-elegan text-cokelat text-center mb-5">
-            Detail Booking
-        </h3>
+            'terkonfirmasi' => [
+                'label' => 'Terkonfirmasi',
+                'class' => 'bg-success text-white',
+                'icon' => 'bi-shield-check',
+            ],
 
-        <div class="row">
+            'berlangsung' => [
+                'label' => 'Berlangsung',
+                'class' => 'bg-primary text-white',
+                'icon' => 'bi-camera-fill',
+            ],
 
-            <div class="col-lg-4 text-center mb-4 mb-lg-0">
+            'selesai' => [
+                'label' => 'Selesai',
+                'class' => 'bg-secondary text-white',
+                'icon' => 'bi-check-circle-fill',
+            ],
+        ];
 
-    <div class="qr-wrapper">
+        $statusAktif = $statusData[$statusReservasi] ?? [
+            'label' => ucwords(str_replace('_', ' ', $statusReservasi)),
+            'class' => 'bg-secondary text-white',
+            'icon' => 'bi-info-circle',
+        ];
+    @endphp
 
-        {!! QrCode::size(170)
-            ->color(74,53,37)
-            ->generate($booking->kode_booking) !!}
+    <hr class="my-5">
 
-    </div>
+    <div class="detail-booking-wrapper">
 
-    <h4 class="booking-code mt-3 mb-0">
-        {{ $booking->kode_booking }}
-    </h4>
+        <div class="card border-0 shadow-lg booking-detail-card">
 
-</div>
+            <div class="card-body">
 
-            <div class="col-lg-8">
+                <h3 class="judul-elegan text-cokelat text-center mb-4">
+                    Detail Booking
+                </h3>
 
-                <div class="booking-info-list">
+                <div class="row align-items-start g-4">
 
-                    <div class="booking-item">
-                        <span class="booking-label">
-                            Nama
-                        </span>
+                    <!-- QR CHECK-IN -->
+                    <div class="col-12 col-lg-4 text-center">
 
-                        <span class="booking-value">
-                            {{ $booking->customer_name }}
-                        </span>
+                        @if($statusReservasi === 'terkonfirmasi')
+
+                            <div class="qr-wrapper">
+
+                                {!! QrCode::size(170)
+                                    ->color(74, 53, 37)
+                                    ->generate($booking->kode_booking) !!}
+
+                            </div>
+
+                            <div class="mt-3">
+
+                                <span class="badge rounded-pill bg-success px-3 py-2">
+                                    <i class="bi bi-qr-code me-1"></i>
+                                    QR Check-in Aktif
+                                </span>
+
+                            </div>
+
+                        @elseif($statusReservasi === 'berlangsung')
+
+                            <div class="qr-locked">
+
+                                <i class="bi bi-check-circle-fill text-primary"></i>
+
+                                <h6>Sudah Check-in</h6>
+
+                                <p>
+                                    QR telah dipindai oleh admin dan sesi foto
+                                    sedang berlangsung.
+                                </p>
+
+                            </div>
+
+                        @elseif($statusReservasi === 'selesai')
+
+                            <div class="qr-locked">
+
+                                <i class="bi bi-check2-circle text-success"></i>
+
+                                <h6>Reservasi Selesai</h6>
+
+                                <p>
+                                    Proses reservasi dan sesi pemotretan
+                                    telah selesai.
+                                </p>
+
+                            </div>
+
+                        @else
+
+                            <div class="qr-locked">
+
+                                <i class="bi bi-lock-fill"></i>
+
+                                <h6>QR Belum Tersedia</h6>
+
+                                <p>
+                                    QR check-in akan tersedia setelah pembayaran
+                                    DP berhasil diverifikasi oleh admin.
+                                </p>
+
+                            </div>
+
+                        @endif
+
+                        <h4 class="booking-code mt-3 mb-0">
+                            {{ $booking->kode_booking }}
+                        </h4>
+
                     </div>
 
-                    <div class="booking-item">
-                        <span class="booking-label">
-                            Nomor HP
-                        </span>
+                    <!-- INFORMASI BOOKING -->
+                    <div class="col-12 col-lg-8">
 
-                        <span class="booking-value">
-                            {{ $booking->no_hp }}
-                        </span>
+                        <div class="booking-info-list">
+
+                            <div class="booking-item">
+
+                                <span class="booking-label">
+                                    <i class="bi bi-person"></i>
+                                    Nama
+                                </span>
+
+                                <span class="booking-value">
+                                    {{ $booking->customer_name }}
+                                </span>
+
+                            </div>
+
+                            <div class="booking-item">
+
+                                <span class="booking-label">
+                                    <i class="bi bi-phone"></i>
+                                    Nomor WhatsApp
+                                </span>
+
+                                <span class="booking-value">
+                                    {{ $booking->no_hp }}
+                                </span>
+
+                            </div>
+
+                            <div class="booking-item">
+
+                                <span class="booking-label">
+                                    <i class="bi bi-camera"></i>
+                                    Paket
+                                </span>
+
+                                <span class="booking-value">
+                                    {{ $booking->package->nama_paket ?? '-' }}
+                                </span>
+
+                            </div>
+
+                            <div class="booking-item">
+
+                                <span class="booking-label">
+                                    <i class="bi bi-calendar3"></i>
+                                    Tanggal
+                                </span>
+
+                                <span class="booking-value">
+                                    {{ \Carbon\Carbon::parse($booking->tanggal)
+                                        ->locale('id')
+                                        ->translatedFormat('d F Y') }}
+                                </span>
+
+                            </div>
+
+                            <div class="booking-item">
+
+                                <span class="booking-label">
+                                    <i class="bi bi-clock"></i>
+                                    Jam
+                                </span>
+
+                                <span class="booking-value">
+                                    {{ \Carbon\Carbon::parse($booking->jam_mulai)
+                                        ->format('H:i') }} WITA
+                                </span>
+
+                            </div>
+
+                            <div class="booking-item">
+
+                                <span class="booking-label">
+                                    <i class="bi {{ $statusAktif['icon'] }}"></i>
+                                    Status
+                                </span>
+
+                                <span>
+
+                                    <span class="status-badge {{ $statusAktif['class'] }}">
+                                        {{ $statusAktif['label'] }}
+                                    </span>
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div class="booking-item">
-                        <span class="booking-label">
-                            Paket
-                        </span>
-
-                        <span class="booking-value">
-                            {{ $booking->package->nama_paket }}
-                        </span>
-                    </div>
-
-                    <div class="booking-item">
-                        <span class="booking-label">
-                            Tanggal
-                        </span>
-
-                        <span class="booking-value">
-                            {{ \Carbon\Carbon::parse($booking->tanggal)->translatedFormat('d F Y') }}
-                        </span>
-                    </div>
-
-                    <div class="booking-item">
-    <span class="booking-label">
-        Jam
-    </span>
-
-    <span class="booking-value">
-        {{ \Carbon\Carbon::parse($booking->jam_mulai)->format('H:i') }} WITA
-    </span>
-</div>
-
-<!-- STATUS DITAMBAHKAN DI SINI -->
-
-<div class="booking-item">
-
-    <span class="booking-label">
-        Status
-    </span>
-
-    <span>
-
-        @if($booking->status=='Pending')
-
-            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
-                Pending
-            </span>
-
-        @elseif($booking->status=='Confirmed')
-
-    <span class="badge rounded-pill bg-success px-3 py-2">
-        Disetujui
-    </span>
-
-@elseif($booking->status=='Checked-in')
-
-    <span class="badge rounded-pill bg-primary px-3 py-2">
-        Checked-in
-    </span>
-
-@elseif($booking->status=='Selesai')
-
-    <span class="badge rounded-pill bg-secondary px-3 py-2">
-        Selesai
-    </span>
-
-@else
-
-    <span class="badge rounded-pill bg-danger px-3 py-2">
-        Ditolak
-    </span>
-
-@endif
-
-    </span>
-
-</div>
-
-</div> <!-- booking-info-list -->
+                </div>
 
             </div>
 
         </div>
 
+        <!-- INFORMASI SESUAI STATUS -->
+        <div class="status-info-card">
+
+            @if($statusReservasi === 'menunggu_pembayaran')
+
+                <div class="alert alert-warning border-0 shadow-sm">
+
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-wallet2 me-2"></i>
+                        Menunggu Pembayaran DP
+                    </h5>
+
+                    <p class="mb-0">
+                        Reservasi berhasil dibuat. Silakan meminta QRIS kepada
+                        admin melalui WhatsApp dan lakukan pembayaran DP.
+                        Setelah itu, klik tombol Lanjut Pembayaran untuk
+                        mengunggah bukti pembayaran.
+                    </p>
+
+                </div>
+
+            @elseif($statusReservasi === 'menunggu_verifikasi')
+
+                <div class="alert alert-info border-0 shadow-sm">
+
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        Bukti Pembayaran Sedang Diverifikasi
+                    </h5>
+
+                    <p class="mb-0">
+                        Bukti pembayaran Anda sudah diterima. Mohon menunggu
+                        admin memeriksa pembayaran. QR check-in akan tersedia
+                        setelah reservasi dikonfirmasi.
+                    </p>
+
+                </div>
+
+            @elseif($statusReservasi === 'terkonfirmasi')
+
+                <div class="alert alert-success border-0 shadow-sm">
+
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-shield-check me-2"></i>
+                        Reservasi Terkonfirmasi
+                    </h5>
+
+                    <p class="mb-0">
+                        Pembayaran DP telah diverifikasi. Simpan QR check-in
+                        di atas dan tunjukkan kepada admin saat datang ke studio.
+                        Mohon hadir 15 menit sebelum jadwal pemotretan.
+                    </p>
+
+                </div>
+
+            @elseif($statusReservasi === 'berlangsung')
+
+                <div class="alert alert-primary border-0 shadow-sm">
+
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-camera-fill me-2"></i>
+                        Sesi Pemotretan Berlangsung
+                    </h5>
+
+                    <p class="mb-0">
+                        Customer sudah berhasil check-in dan sesi pemotretan
+                        sedang berlangsung.
+                    </p>
+
+                </div>
+
+            @elseif($statusReservasi === 'selesai')
+
+                <div class="alert alert-secondary border-0 shadow-sm">
+
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Reservasi Selesai
+                    </h5>
+
+                    <p class="mb-0">
+                        Terima kasih telah menggunakan layanan Lafayette Photo
+                        Studio. Reservasi dan sesi pemotretan telah selesai.
+                    </p>
+
+                </div>
+
+            @else
+
+                <div class="alert alert-secondary border-0 shadow-sm">
+
+                    <h5 class="fw-bold mb-2">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Informasi Reservasi
+                    </h5>
+
+                    <p class="mb-0">
+                        Status reservasi saat ini:
+                        <strong>{{ $statusAktif['label'] }}</strong>.
+                    </p>
+
+                </div>
+
+            @endif
+
+        </div>
+
+        <!-- TOMBOL AKSI -->
+        <div class="detail-actions">
+
+            @if($statusReservasi === 'menunggu_pembayaran')
+
+                <a
+                    href="{{ route('booking.pembayaran', $booking->kode_booking) }}"
+                    class="btn btn-cokelat btn-action"
+                >
+                    <i class="bi bi-wallet2 me-2"></i>
+                    Lanjut Pembayaran
+                </a>
+
+            @elseif($statusReservasi === 'menunggu_verifikasi')
+
+                <button
+                    type="button"
+                    class="btn btn-info btn-action text-dark"
+                    disabled
+                >
+                    <i class="bi bi-hourglass-split me-2"></i>
+                    Menunggu Verifikasi
+                </button>
+
+            @elseif($statusReservasi === 'terkonfirmasi')
+
+                <a
+                    href="{{ route('booking.pdf', $booking->kode_booking) }}"
+                    class="btn btn-success btn-action"
+                    target="_blank"
+                >
+                    <i class="bi bi-download me-2"></i>
+                    Lihat Check-in Pass
+                </a>
+
+               @elseif($statusReservasi === 'berlangsung')
+
+                <button
+                    type="button"
+                    class="btn btn-primary btn-action"
+                    disabled
+                >
+                    <i class="bi bi-camera-fill me-2"></i>
+                    Sedang Berlangsung
+                </button>
+
+            @elseif($statusReservasi === 'selesai')
+
+                <a
+                    href="{{ route('booking.index') }}"
+                    class="btn btn-cokelat btn-action"
+                >
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    Booking Lagi
+                </a>
+
+            @endif
+
+            <a
+                href="{{ url('/') }}"
+                class="btn btn-outline-cokelat btn-action"
+            >
+                <i class="bi bi-house me-2"></i>
+                Beranda
+            </a>
+
+        </div>
+
     </div>
 
-</div> <!-- Card Detail Booking Selesai -->
-
-
-<!-- ========================= -->
-<!-- INFORMASI STATUS BOOKING -->
-<!-- ========================= -->
-
-<div class="status-info-card mt-4">
-
-@if($booking->status == 'Pending')
-
-<div class="alert alert-warning border-0 shadow-sm">
-
-<h5 class="fw-bold mb-2">
-⏳ Menunggu Konfirmasi Admin
-</h5>
-
-Reservasi Anda telah berhasil dikirim.
-
-Admin Lafayette Photo Studio sedang melakukan verifikasi jadwal.
-
-Silakan cek status booking secara berkala.
-
-</div>
-
-@elseif($booking->status == 'Confirmed')
-
-<div class="alert alert-success border-0 shadow-sm">
-
-<h5 class="fw-bold mb-2">
-✅ Reservasi Disetujui
-</h5>
-
-Selamat!
-
-Reservasi Anda telah disetujui.
-
-Silakan mengunduh <b>Check-in Pass</b> dan datang 15 menit sebelum jadwal pemotretan.
-
-</div>
-
-@elseif($booking->status == 'Checked-in')
-
-<div class="alert alert-primary border-0 shadow-sm">
-
-<h5 class="fw-bold mb-2">
-📸 Sudah Check-in
-</h5>
-
-Customer telah berhasil melakukan proses check-in.
-
-Silakan menunggu sesi pemotretan dimulai.
-
-</div>
-
-@elseif($booking->status == 'Selesai')
-
-<div class="alert alert-secondary border-0 shadow-sm">
-
-<h5 class="fw-bold mb-2">
-🎉 Reservasi Selesai
-</h5>
-
-Terima kasih telah menggunakan layanan Lafayette Photo Studio.
-
-</div>
-
-@else
-
-<div class="alert alert-danger border-0 shadow-sm">
-
-<h5 class="fw-bold mb-2">
-❌ Reservasi Ditolak
-</h5>
-
-Mohon maaf,
-
-Reservasi Anda belum dapat disetujui.
-
-Silakan melakukan reservasi ulang dan memilih jadwal lain yang masih tersedia.
-
-</div>
-
 @endif
 
-</div>
-
-</div>
-
-<div class="text-center mt-2">
-
-@if($booking->status=='Pending')
-
-<a href="https://wa.me/6285216962962?text=Halo%20Admin%20Lafayette%20Photo%20Studio,%20saya%20ingin%20menanyakan%20status%20booking%20saya."
-target="_blank"
-class="btn btn-cokelat btn-action">
-
-<i class="bi bi-whatsapp me-2"></i>
-
-Hubungi Admin
-
-</a>
-
-@elseif($booking->status=='Confirmed')
-
-<a href="{{ route('booking.pdf',$booking->kode_booking) }}"
-class="btn btn-success btn-action">
-
-<i class="bi bi-download me-2"></i>
-
-Download Check-in Pass
-
-</a>
-
-@elseif($booking->status=='Checked-in')
-
-<button class="btn btn-primary btn-action" disabled>
-
-<i class="bi bi-check-circle-fill me-2"></i>
-
-Sudah Check-in
-
-</button>
-
-@elseif($booking->status=='Batal')
-
-<a href="{{ route('booking.index') }}"
-class="btn btn-danger btn-action">
-
-<i class="bi bi-arrow-repeat me-2"></i>
-
-Booking Lagi
-
-</a>
-
-@endif
-
-
-<a href="{{ url('/') }}"
-class="btn btn-outline-cokelat btn-action">
-
-<i class="bi bi-house me-2"></i>
-
-Beranda
-
-</a>
-
-</div>
-
-
-        </div> <!-- card-body -->
-        </div> <!-- card -->
-    </div> <!-- col-lg-8 -->
-
-</div> <!-- row -->
-
-@endif
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

@@ -357,45 +357,215 @@ body{
     color:#fff;
 
 }
+
+.notification-button {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.25s ease;
+}
+
+.notification-button:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #e63946;
+    color: #ffffff;
+    border: 2px solid #bd916b;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+}
+
+.booking-toast {
+    position: fixed;
+    top: 130px;
+    right: 28px;
+    z-index: 9999;
+    width: min(390px, calc(100vw - 32px));
+    padding: 18px;
+    border: 1px solid #ead7c6;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(84, 53, 30, 0.2);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(30px);
+    transition: 0.3s ease;
+}
+
+.booking-toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.booking-toast-icon {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5e7d9;
+    color: #98613d;
+    font-size: 22px;
+}
+
+.booking-toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.booking-toast-label {
+    color: #b4835c;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.booking-toast-content h6 {
+    margin: 4px 0 6px;
+    color: #4f3321;
+    font-weight: 700;
+}
+
+.booking-toast-content p {
+    margin: 0 0 8px;
+    color: #74665d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.booking-toast-link {
+    color: #a66d43;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.booking-toast-link:hover {
+    color: #7c4c2d;
+}
+
+.booking-toast-close {
+    border: 0;
+    background: transparent;
+    color: #9a8a80;
+    font-size: 15px;
+    padding: 2px;
+}
+
+.notification-button.ringing {
+    animation: bellRing 0.8s ease;
+}
+
+@keyframes bellRing {
+    0%, 100% {
+        transform: rotate(0);
+    }
+
+    20% {
+        transform: rotate(15deg);
+    }
+
+    40% {
+        transform: rotate(-15deg);
+    }
+
+    60% {
+        transform: rotate(10deg);
+    }
+
+    80% {
+        transform: rotate(-10deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .booking-toast {
+        top: 110px;
+        right: 16px;
+    }
+}
 </style>
 
 </head>
 <body>
     
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-
+    <nav class="navbar navbar-custom">
     <div class="container-fluid px-4 d-flex align-items-center">
 
         <!-- Logo -->
         <a href="#" class="navbar-brand">
-
-            <img src="{{ asset('images/logo-lafayette.png') }}"
-                 class="navbar-logo"
-                 alt="Logo">
+            <img
+                src="{{ asset('images/logo-lafayette.png') }}"
+                class="navbar-logo"
+                alt="Logo"
+            >
 
             <span class="judul-elegan">
                 Lafayette Admin
             </span>
-
         </a>
 
         <!-- Menu -->
         <div class="ms-5">
-
-            <a href="{{ route('packages.index') }}"
-               class="nav-link-kapsul">
-
+            <a
+                href="{{ route('packages.index') }}"
+                class="nav-link-kapsul"
+            >
                 Kelola Paket Foto
-
             </a>
-
         </div>
 
-        <!-- Dorong Logout ke kanan -->
-        <div class="ms-auto">
+        <!-- Notifikasi dan Logout -->
+        <div class="ms-auto d-flex align-items-center gap-3">
 
-            <form action="{{ route('admin.logout') }}" method="POST">
+            <button
+                type="button"
+                class="notification-button"
+                id="notificationButton"
+                title="Notifikasi booking baru"
+            >
+                <i class="bi bi-bell-fill"></i>
+
+                <span
+                    class="notification-badge d-none"
+                    id="notificationBadge"
+                >
+                    0
+                </span>
+            </button>
+
+            <form
+                action="{{ route('admin.logout') }}"
+                method="POST"
+                class="m-0"
+            >
                 @csrf
+
                 <button type="submit" class="btn-logout">
                     Logout
                 </button>
@@ -404,12 +574,56 @@ body{
         </div>
 
     </div>
-
 </nav>
 
-    <div class="container-fluid px-4 mt-5 mb-5">
-        
-        @if(session('success'))
+<!-- Toast Notifikasi Booking -->
+<div
+    class="booking-toast"
+    id="bookingToast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+>
+    <div class="booking-toast-icon">
+        <i class="bi bi-calendar2-check-fill"></i>
+    </div>
+
+    <div class="booking-toast-content">
+        <small class="booking-toast-label">
+            Reservasi Terbaru
+        </small>
+
+        <h6 id="toastTitle">
+            Booking baru masuk
+        </h6>
+
+        <p id="toastMessage">
+            Ada reservasi baru dari customer.
+        </p>
+
+        <a
+            href="#"
+            id="toastDetailLink"
+            class="booking-toast-link"
+        >
+            Lihat Detail
+            <i class="bi bi-arrow-right-short"></i>
+        </a>
+    </div>
+
+    <button
+        type="button"
+        class="booking-toast-close"
+        id="toastCloseButton"
+        aria-label="Tutup notifikasi"
+    >
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+
+<div class="container-fluid px-4 mt-5 mb-5">
+
+    @if(session('success'))
             <div class="alert alert-success fw-bold shadow-sm border-0 animasi-masuk" style="border-radius: 10px;">{{ session('success') }}</div>
         @endif
         @if(session('error'))
@@ -515,55 +729,51 @@ body{
 
             <div class="modal-body">
 
-                <form action="{{ route('admin.exportExcel') }}" method="GET">
+               <form action="{{ route('admin.exportExcel') }}" method="GET">
 
-                    <div class="mb-3">
+    <div class="mb-3">
+        <label
+            for="tanggalAwalExcel"
+            class="form-label fw-bold"
+        >
+            Tanggal Awal
+        </label>
 
-                        <label class="form-label fw-bold">
-                            Pilih Periode
-                        </label>
+        <input
+            type="date"
+            class="form-control"
+            id="tanggalAwalExcel"
+            name="tanggal_awal"
+            required
+        >
+    </div>
 
-                        <select class="form-select" id="periodeExcel" name="periode">
+    <div class="mb-3">
+        <label
+            for="tanggalAkhirExcel"
+            class="form-label fw-bold"
+        >
+            Tanggal Akhir
+        </label>
 
-                            <option value="harian">
-                                Harian
-                            </option>
+        <input
+            type="date"
+            class="form-control"
+            id="tanggalAkhirExcel"
+            name="tanggal_akhir"
+            required
+        >
+    </div>
 
-                            <option value="mingguan">
-                                Mingguan
-                            </option>
+    <button
+    type="submit"
+    class="btn btn-success w-100"
+    >
+    <i class="bi bi-download me-2"></i>
+    Download Excel
+    </button>
 
-                            <option value="bulanan">
-                                Bulanan
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label fw-bold">
-
-                            Tanggal
-
-                        </label>
-
-                        <input type="date" class="form-control"id="tanggalExcel"name="tanggal">
-
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="btn btn-success w-100">
-
-                        <i class="bi bi-download me-2"></i>
-
-                        Download Excel
-
-                    </button>
-
-                </form>
+</form>
 
             </div>
 
@@ -589,56 +799,51 @@ body{
 
             <div class="modal-body">
 
-                <form action="{{ route('admin.exportPdf') }}" method="GET">
+                <form action="{{ route('admin.exportPdf') }}" method="GET" target="_blank">
 
-                    <div class="mb-3">
+    <div class="mb-3">
+        <label
+            for="tanggalAwalPdf"
+            class="form-label fw-bold"
+        >
+            Tanggal Awal
+        </label>
 
-                        <label class="form-label fw-bold">
-                            Pilih Periode
-                        </label>
+        <input
+            type="date"
+            class="form-control"
+            id="tanggalAwalPdf"
+            name="tanggal_awal"
+            required
+        >
+    </div>
 
-                        <select class="form-select" id="periodePdf" name="periode">
+    <div class="mb-3">
+        <label
+            for="tanggalAkhirPdf"
+            class="form-label fw-bold"
+        >
+            Tanggal Akhir
+        </label>
 
-                            <option value="harian">
-                                Harian
-                            </option>
+        <input
+            type="date"
+            class="form-control"
+            id="tanggalAkhirPdf"
+            name="tanggal_akhir"
+            required
+        >
+    </div>
 
-                            <option value="mingguan">
-                                Mingguan
-                            </option>
+    <button
+        type="submit"
+        class="btn btn-danger w-100"
+    >
+        <i class="bi bi-file-earmark-pdf-fill me-2"></i>
+        Download PDF
+    </button>
 
-                            <option value="bulanan">
-                                Bulanan
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label fw-bold">
-                            Tanggal
-                        </label>
-
-                        <input
-                        type="date"
-                        class="form-control"
-                        id="tanggalPdf"
-                        name="tanggal">
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="btn btn-danger w-100">
-
-                        <i class="bi bi-file-earmark-pdf-fill me-2"></i>
-
-                        Download PDF
-
-                    </button>
-
-                </form>
+</form>
 
             </div>
 
@@ -652,128 +857,163 @@ body{
 
 <div class="row g-3 mb-4">
 
-    <div class="col">
-        <div class="stats-card">
-
-<div class="row g-3 mb-4">
-
-    <div class="col">
+    <div class="col-md-4 col-xl-2">
         <div class="stats-card">
             <div class="stats-icon bg-total">
                 <i class="bi bi-calendar-check"></i>
             </div>
+
             <h3>{{ $totalBooking }}</h3>
             <small>Total Reservasi</small>
         </div>
     </div>
 
-    <div class="col">
+    <div class="col-md-4 col-xl-2">
         <div class="stats-card">
             <div class="stats-icon bg-warning-soft">
-                <i class="bi bi-hourglass-split"></i>
+                <i class="bi bi-wallet2"></i>
             </div>
-            <h3>{{ $totalPending }}</h3>
-            <small>Pending</small>
+
+            <h3>{{ $totalMenungguPembayaran }}</h3>
+            <small>Menunggu Pembayaran</small>
         </div>
     </div>
 
-    <div class="col">
+    <div class="col-md-4 col-xl-2">
+        <div class="stats-card">
+            <div class="stats-icon bg-primary-soft">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+
+            <h3>{{ $totalMenungguVerifikasi }}</h3>
+            <small>Menunggu Verifikasi</small>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-xl-2">
+        <div class="stats-card">
+            <div class="stats-icon bg-success-soft">
+                <i class="bi bi-shield-check"></i>
+            </div>
+
+            <h3>{{ $totalTerkonfirmasi }}</h3>
+            <small>Terkonfirmasi</small>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-xl-2">
         <div class="stats-card">
             <div class="stats-icon bg-primary-soft">
                 <i class="bi bi-camera-fill"></i>
             </div>
-            <h3>{{ $totalCheckin }}</h3>
-            <small>Check-in</small>
+
+            <h3>{{ $totalBerlangsung }}</h3>
+            <small>Berlangsung</small>
         </div>
     </div>
 
-    <div class="col">
+    <div class="col-md-4 col-xl-2">
         <div class="stats-card">
             <div class="stats-icon bg-success-soft">
                 <i class="bi bi-check-circle-fill"></i>
             </div>
+
             <h3>{{ $totalSelesai }}</h3>
             <small>Selesai</small>
         </div>
     </div>
+
 </div>
 
-        <form method="GET"
-      action="{{ route('admin.dashboard') }}"
-      class="mb-4">
-
+<form
+    method="GET"
+    action="{{ route('admin.dashboard') }}"
+    class="mb-4"
+>
     <div class="row g-3 align-items-center">
 
         <!-- Search -->
         <div class="col-lg-7">
-
             <div class="input-group">
 
                 <span class="input-group-text bg-white">
-
                     <i class="bi bi-search"></i>
-
                 </span>
 
                 <input
                     type="text"
                     name="search"
                     class="form-control"
-                    placeholder="Cari kode booking, nama pelanggan, atau nomor WhatsApp..."
-                    value="{{ request('search') }}">
+                    placeholder="Cari kode booking atau nama pelanggan..."
+                    value="{{ request('search') }}"
+                >
 
             </div>
-
         </div>
 
-        <!-- Filter -->
+        <!-- Filter Status -->
         <div class="col-lg-3">
 
             <select
                 name="status"
-                class="form-select">
-
-                <option value="">Semua Status</option>
-
-                <option value="Pending"
-                    {{ request('status')=='Pending' ? 'selected' : '' }}>
-                    Pending
+                class="form-select"
+            >
+                <option value="">
+                    Semua Status
                 </option>
 
-                <option value="Confirmed"
-                    {{ request('status')=='Confirmed' ? 'selected' : '' }}>
-                    Disetujui
+                <option
+                    value="menunggu_pembayaran"
+                    {{ request('status') === 'menunggu_pembayaran' ? 'selected' : '' }}
+                >
+                    Menunggu Pembayaran
                 </option>
 
-                <option value="Checked-in"
-                    {{ request('status')=='Checked-in' ? 'selected' : '' }}>
-                    Check-in
+                <option
+                    value="menunggu_verifikasi"
+                    {{ request('status') === 'menunggu_verifikasi' ? 'selected' : '' }}
+                >
+                    Menunggu Verifikasi
                 </option>
 
-                <option value="Selesai"
-                    {{ request('status')=='Selesai' ? 'selected' : '' }}>
+                <option
+                    value="terkonfirmasi"
+                    {{ request('status') === 'terkonfirmasi' ? 'selected' : '' }}
+                >
+                    Terkonfirmasi
+                </option>
+
+                <option
+                    value="berlangsung"
+                    {{ request('status') === 'berlangsung' ? 'selected' : '' }}
+                >
+                    Berlangsung
+                </option>
+
+                <option
+                    value="selesai"
+                    {{ request('status') === 'selesai' ? 'selected' : '' }}
+                >
                     Selesai
                 </option>
-            </select>
 
+            </select>
         </div>
 
-        <!-- Tombol -->
+        <!-- Tombol Filter -->
         <div class="col-lg-2">
 
             <button
                 type="submit"
-                class="btn btn-cokelat w-100">
-
+                class="btn btn-cokelat w-100"
+            >
                 <i class="bi bi-funnel-fill me-2"></i>
                 Filter
-
             </button>
 
         </div>
 
     </div>
-
 </form>
 
         <div class="card card-custom overflow-hidden animasi-masuk" style="animation-delay:0.2s;">
@@ -799,77 +1039,61 @@ body{
                                 <td>{{ \Carbon\Carbon::parse($booking->tanggal)->locale('id')->translatedFormat('d F Y') }}<br> <span class="badge bg-secondary mt-1">{{ \Carbon\Carbon::parse($booking->jam_mulai)->format('H:i') }}</span></td>
                                 <td>
 
-    @if($booking->status == 'Pending')
+    @if($booking->status_reservasi === 'menunggu_pembayaran')
 
-        <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
-            ⏳ Pending
-        </span>
+    <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+        Menunggu Pembayaran
+    </span>
 
-    @elseif($booking->status == 'Confirmed')
+@elseif($booking->status_reservasi === 'menunggu_verifikasi')
 
-        <span class="badge rounded-pill bg-success px-3 py-2">
-            ✅ Disetujui
-        </span>
+    <span class="badge rounded-pill bg-info text-dark px-3 py-2">
+        Menunggu Verifikasi
+    </span>
 
-    @elseif($booking->status == 'Checked-in')
+@elseif($booking->status_reservasi === 'terkonfirmasi')
 
-        <span class="badge rounded-pill bg-primary px-3 py-2">
-            📸 Check-in
-        </span>
+    <span class="badge rounded-pill bg-success px-3 py-2">
+        Terkonfirmasi
+    </span>
 
-    @elseif($booking->status == 'Selesai')
+@elseif($booking->status_reservasi === 'berlangsung')
 
-        <span class="badge rounded-pill bg-secondary px-3 py-2">
-            ✔ Selesai
-        </span>
+    <span class="badge rounded-pill bg-primary px-3 py-2">
+        Berlangsung
+    </span>
 
-    @else
+@elseif($booking->status_reservasi === 'selesai')
 
-        <span class="badge rounded-pill bg-danger px-3 py-2">
-            ❌ Ditolak
-        </span>
+    <span class="badge rounded-pill bg-secondary px-3 py-2">
+        Selesai
+    </span>
 
-    @endif
+@else
+
+    <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
+        Status Tidak Diketahui
+    </span>
+
+@endif
 
 </td>
 
                                 <td>
-                                    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center">
 
-                                        <!-- Tombol Aksi Setujui -->
-<form action="{{ route('admin.updateStatus', $booking->id) }}"
-      method="POST"
-      class="d-inline">
+        <a
+            href="{{ route('admin.bookingDetail', $booking->id) }}"
+            class="btn btn-primary btn-sm"
+            title="Lihat Detail Reservasi"
+        >
+            <i class="bi bi-eye me-1"></i>
+            Detail
+        </a>
 
-    @csrf
-
-    <input type="hidden"
-           name="status"
-           value="Confirmed">
-
-    <button class="btn btn-success btn-sm rounded-circle"
-        title="Setujui Reservasi">
-
-    <i class="bi bi-check-lg"></i>
-</button>
-
-</form>
-
-                                        <!-- Tombol Aksi Selesai -->
-                                        <form action="{{ route('admin.updateStatus', $booking->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="status" value="Selesai">
-                                            <button type="submit" class="btn-aksi btn-aksi-selesai" title="Tandai Selesai">✔️</button>
-                                        </form>
-
-                                        <!-- Tombol Aksi Hapus -->
-                                        <form action="{{ route('admin.deleteBooking', $booking->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-aksi btn-aksi-hapus" title="Hapus Data">🗑️</button>
-                                        </form>
-                                    </div>
-                                </td>
+    </div>
+</td>
+                        
                             </tr>
                             @empty
                             <tr><td colspan="6" class="text-muted py-5">Belum ada data reservasi pelanggan.</td></tr>
@@ -923,6 +1147,110 @@ body{
             html5QrcodeScanner.clear();
         })
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const notificationButton = document.getElementById('notificationButton');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const bookingToast = document.getElementById('bookingToast');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastMessage = document.getElementById('toastMessage');
+    const toastDetailLink = document.getElementById('toastDetailLink');
+    const toastCloseButton = document.getElementById('toastCloseButton');
+
+    let terakhirDilihat = new Date().toISOString();
+    let jumlahNotifikasi = 0;
+    let toastTimer = null;
+
+    async function cekBookingBaru() {
+        try {
+            const response = await fetch(
+                "{{ route('admin.notifikasiBooking') }}" +
+                "?terakhir_dilihat=" +
+                encodeURIComponent(terakhirDilihat),
+                {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Gagal mengambil notifikasi booking.');
+            }
+
+            const data = await response.json();
+
+            if (data.booking.length > 0) {
+                jumlahNotifikasi += data.jumlah;
+
+                tampilkanBadge();
+
+                const bookingTerbaru = data.booking[0];
+
+                toastTitle.textContent =
+                    'Booking Baru: ' + bookingTerbaru.kode_booking;
+
+                toastMessage.textContent =
+                    bookingTerbaru.customer_name +
+                    ' memesan paket ' +
+                    bookingTerbaru.nama_paket +
+                    ' untuk ' +
+                    bookingTerbaru.tanggal +
+                    ' pukul ' +
+                    bookingTerbaru.jam +
+                    '.';
+
+                toastDetailLink.href = bookingTerbaru.detail_url;
+
+                tampilkanToast();
+
+                notificationButton.classList.add('ringing');
+
+                setTimeout(function () {
+                    notificationButton.classList.remove('ringing');
+                }, 800);
+
+                terakhirDilihat = data.booking[0].created_at;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function tampilkanBadge() {
+        notificationBadge.textContent =
+            jumlahNotifikasi > 99 ? '99+' : jumlahNotifikasi;
+
+        notificationBadge.classList.remove('d-none');
+    }
+
+    function tampilkanToast() {
+        bookingToast.classList.add('show');
+
+        clearTimeout(toastTimer);
+
+        toastTimer = setTimeout(function () {
+            bookingToast.classList.remove('show');
+        }, 8000);
+    }
+
+    toastCloseButton.addEventListener('click', function () {
+        bookingToast.classList.remove('show');
+        clearTimeout(toastTimer);
+    });
+
+    notificationButton.addEventListener('click', function () {
+        jumlahNotifikasi = 0;
+        notificationBadge.textContent = '0';
+        notificationBadge.classList.add('d-none');
+
+        window.location.href = "{{ route('admin.dashboard') }}";
+    });
+
+    setInterval(cekBookingBaru, 10000);
+});
+</script>
 
 </body>
 </html>

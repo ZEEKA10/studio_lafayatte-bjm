@@ -154,7 +154,7 @@
                 </td>
 
                 <td>
-                    {{ $booking->status }}
+                    {{ ucwords(str_replace('_', ' ', $booking->status_reservasi)) }}
                 </td>
 
             </tr>

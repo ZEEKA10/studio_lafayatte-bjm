@@ -28,6 +28,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
         ->name('admin.dashboard');
 
+    Route::get(
+    '/admin/notifikasi-booking',
+    [AdminController::class, 'notifikasiBooking']
+    )->name('admin.notifikasiBooking');
+
+    Route::get('/admin/booking/{id}', [AdminController::class, 'bookingDetail'])
+    ->name('admin.bookingDetail');
+
     Route::get('/admin/export-excel', [AdminController::class, 'exportExcel'])
         ->name('admin.exportExcel');
 
@@ -42,6 +50,11 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/admin/booking/{id}', [AdminController::class, 'deleteBooking'])
         ->name('admin.deleteBooking');
+
+    Route::post(
+    '/booking/{kode_booking}/upload-bukti',
+    [BookingController::class, 'uploadBukti']
+    )->name('booking.upload-bukti');
 
     Route::resource('/admin/packages', App\Http\Controllers\PackageController::class);
 

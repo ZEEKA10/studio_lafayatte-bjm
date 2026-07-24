@@ -529,65 +529,83 @@ color:#fff;
     </p>
 
 </div>
-            <div class="row align-items-start g-3">
+            <div class="row align-items-stretch g-3">
 
-                {{-- QR CODE --}}
-                <div class="col-lg-6">
+    {{-- QR CHECK-IN --}}
+<div class="col-lg-6">
 
-                    <div class="p-4 shadow-sm text-center"
-                        style="
-                        background:white;
-                        border-radius:25px;
-                        border:1px solid #EEE;
-                        ">
+    <div
+        class="card border-0 shadow-sm h-100"
+        style="
+            border-radius: 25px;
+            overflow: hidden;
+        "
+    >
+        <div class="card-body p-4 text-center">
 
-                        <div class="pass-header">
+            <div class="pass-badge">
+                CHECK-IN PASS
+            </div>
 
-                    <div class="pass-badge">
-    CHECK-IN PASS
+            <h3 class="mt-3 text-cokelat">
+                Lafayette Photo Studio
+            </h3>
+
+
+            @if (session()->has('kode_booking'))
+
+                <div
+                    class="bg-white p-4 rounded-4 shadow-lg
+                           d-inline-block my-3"
+                >
+                    {!! QrCode::size(170)
+                        ->color(74, 53, 37)
+                        ->generate(
+                            (string) session('kode_booking')
+                        ) !!}
+                </div>
+
+<div class="mb-3">
+    <span class="badge rounded-pill bg-success px-3 py-2">
+        Booking Aktif
+    </span>
 </div>
 
-<h3 class="mt-3 text-cokelat">
-    Lafayette Photo Studio
-</h3>
+<h2 class="booking-code">
+    {{ session('kode_booking') }}
+</h2>
 
-<span class="badge rounded-pill bg-success px-3 py-2">
-    Booking Aktif
-</span>
-                    </div>
-
-                        <div class="bg-white p-4 rounded-4 shadow-lg d-inline-block my-3">
-                            {!! QrCode::size(170)
-                        ->color(74,53,37)
-                        ->generate(session('kode_booking')) !!}
-                    </div>
-
-                        <h2 class="booking-code">
-                        {{ session('kode_booking') }}
-                    </h2>
-
-                        <div class="mt-2">
-                    <span class="badge rounded-pill text-bg-light border px-3 py-2">
-                        Booking Reference
+                <div class="mt-2">
+                    <span
+                        class="badge rounded-pill
+                               text-bg-light border px-3 py-2"
+                    >
+                        QR Check-in
                     </span>
-                    </div>
-
-                        <small class="text-muted">
-                            Tunjukkan QR Code ini saat datang ke studio.
-                        </small>
-
-                    </div>
-
                 </div>
+
+                <small class="text-muted d-block mt-2">
+                    Simpan QR ini dan tunjukkan kepada
+                    admin saat datang ke studio.
+                </small>
+
+            @endif
+
+        </div>
+    </div>
+
+</div>
 
                 {{-- DETAIL BOOKING --}}
                  <div class="col-lg-6">
 
-        <div class="card border-0 shadow-sm"
-                style="
-                border-radius:25px;
-                overflow:hidden;
-                ">
+    <div
+        class="card border-0 shadow-sm h-100"
+        style="
+            border-radius: 25px;
+            overflow: hidden;
+        "
+    >
 
         <div class="card-body p-4">
 
@@ -643,7 +661,8 @@ color:#fff;
         </span>
 
         <span class="booking-value">
-            {{ session('tanggal') }}
+            {{ \Carbon\Carbon::parse(session('tanggal'))
+            ->translatedFormat('d F Y') }}
         </span>
     </div>
 
@@ -664,11 +683,33 @@ color:#fff;
             Status
         </span>
 
-        <span>
-            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
-                {{ session('status') }}
-            </span>
-        </span>
+        @php
+    $statusReservasi = session('status_reservasi');
+
+    $labelStatus = match ($statusReservasi) {
+        'menunggu_pembayaran' => 'Menunggu Pembayaran',
+        'menunggu_verifikasi' => 'Menunggu Verifikasi',
+        'terkonfirmasi' => 'Terkonfirmasi',
+        'berlangsung' => 'Berlangsung',
+        'selesai' => 'Selesai',
+        default => 'Menunggu Pembayaran',
+    };
+
+    $classStatus = match ($statusReservasi) {
+        'menunggu_pembayaran' => 'bg-warning text-dark',
+        'menunggu_verifikasi' => 'bg-info text-dark',
+        'terkonfirmasi' => 'bg-success',
+        'berlangsung' => 'bg-primary',
+        'selesai' => 'bg-secondary',
+        default => 'bg-warning text-dark',
+    };
+@endphp
+
+<span>
+    <span class="badge rounded-pill {{ $classStatus }} px-3 py-2">
+        {{ $labelStatus }}
+    </span>
+</span>
     </div>
 
         <div class="booking-item">
@@ -678,7 +719,8 @@ color:#fff;
     </span>
 
     <span class="booking-value">
-        Mohon hadir 15 menit sebelum jadwal pemotretan untuk proses registrasi.
+        Mohon hadir 15 menit sebelum jadwal pemotretan untuk registrasi.
+        Jika masih terdapat sisa pembayaran, pelunasan dilakukan di studio sebelum sesi dimulai.
     </span>
 </div>
 
@@ -705,30 +747,60 @@ color:#fff;
     </div>
 
     <small class="payment-label">
-     INFORMASI PEMBAYARAN
-    </small>
+    INFORMASI PEMBAYARAN
+</small>
 
-    <h4 class="payment-title">
+<h4 class="payment-title">
     DP Pembayaran
-    </h4>
+</h4>
 
-    <p class="payment-text">
-        @if(session('wajib_dp'))
+@if(session('wajib_dp'))
 
-        DP yang harus dibayar:
+<p class="payment-text mb-2">
+    DP yang harus dibayar:
+</p>
 
-        <br><br>
+<h2 class="fw-bold text-cokelat">
+    Rp {{ number_format(session('nominal_dp'),0,',','.') }}
+</h2>
 
-        <strong class="fs-4">
-            Rp {{ number_format(session('nominal_dp'),0,',','.') }}
-        </strong>
+<div class="alert alert-light border mt-4 mb-3">
 
-    @else
+    <i class="bi bi-info-circle me-2"></i>
 
-        Paket ini tidak memerlukan DP.
+    Sisa pembayaran dapat dilunasi langsung di studio
+    sebelum sesi pemotretan dimulai.
 
-    @endif
-    </p>
+</div>
+
+<a
+href="https://wa.me/6285216962962?text={{ urlencode(
+'Halo Admin Lafayette Photo Studio, saya ingin meminta QRIS pembayaran DP untuk booking dengan kode '.session('kode_booking')
+) }}"
+target="_blank"
+class="btn btn-success w-100"
+>
+
+<i class="bi bi-whatsapp me-2"></i>
+
+Minta QRIS via WhatsApp
+
+</a>
+
+@else
+
+<div class="alert alert-success mb-0">
+
+    Paket ini tidak memerlukan DP.
+
+    <br>
+
+    Pembayaran dilakukan langsung di studio.
+
+</div>
+
+@endif
+
     </div>
 </div>
 
@@ -737,171 +809,78 @@ color:#fff;
                 <div class="col-md-6">
 
     <div class="card border-0 shadow-sm h-100 payment-card">
-    <div class="card-body p-4">
+        <div class="card-body p-4">
 
-        <div class="payment-icon mb-3">
-        <i class="bi bi-whatsapp"></i>
+            <div class="payment-icon mb-3">
+                <i class="bi bi-search"></i>
+            </div>
+
+            <small class="payment-label">
+                STATUS RESERVASI
+            </small>
+
+            <h4 class="payment-title">
+                Cek Booking
+            </h4>
+
+            <p class="payment-text">
+                Gunakan halaman cek booking untuk melihat perkembangan
+                reservasi dan melanjutkan proses pembayaran.
+            </p>
+
+            <div class="alert alert-light border mt-3">
+
+                <small class="text-muted">
+                    Kode Booking
+                </small>
+
+                <h5 class="mb-0 fw-bold">
+                    {{ session('kode_booking') }}
+                </h5>
+
+            </div>
+
+            <div class="payment-text mt-3">
+
+                <div class="mb-2">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Melihat status reservasi
+                </div>
+
+                <div class="mb-2">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Meminta QRIS pembayaran
+                </div>
+
+                <div class="mb-2">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Mengunggah bukti pembayaran
+                </div>
+
+                <div>
+                    <i class="bi bi-check-circle me-2"></i>
+                    Melihat QR check-in
+                </div>
+
+            </div>
+
+            <a
+                href="{{ route('booking.check', [
+                    'kode' => session('kode_booking'),
+                    'hp' => session('no_hp')
+                ]) }}"
+                class="btn btn-cokelat w-100 mt-4"
+            >
+                <i class="bi bi-search me-2"></i>
+                Cek Status Booking
+            </a>
+
         </div>
-
-        <small class="payment-label">
-            LAYANAN PELANGGAN
-        </small>
-
-        <h4 class="payment-title">
-    Bayar melalui QRIS
-</h4>
-
-<p class="payment-text">
-    @if(session('wajib_dp'))
-
-        Silakan scan QRIS di bawah ini dan lakukan pembayaran sesuai nominal DP.
-
-        <br><br>
-
-        <img
-            src="{{ asset('images/qris-lafayette.png') }}"
-            alt="QRIS Lafayette Photo Studio"
-            class="img-fluid rounded shadow-sm"
-            style="max-width: 230px;"
-        >
-
-        <br><br>
-
-        <small class="text-muted">
-            Pastikan nominal pembayaran sesuai sebelum mengirim bukti pembayaran.
-        </small>
-
-    @else
-
-        Paket ini tidak memerlukan pembayaran DP.
-
-    @endif
-    </p>
-
     </div>
-</div>
 
 </div>
         </div>
         
-        @if(session('wajib_dp') && session('status_reservasi') === 'menunggu_pembayaran'
-    )
-
-    <div class="card border-0 shadow-sm mt-5 mb-5 mx-auto upload-payment-card">
-        <div class="card-body p-3 p-md-4 p-lg-5">
-
-            <div class="text-center mb-4">
-
-                <div class="payment-icon mx-auto mb-3">
-                    <i class="bi bi-cloud-arrow-up"></i>
-                </div>
-
-                <small class="payment-label">
-                    UPLOAD PEMBAYARAN
-                </small>
-
-                <h4 class="payment-title mt-2">
-                    Upload Bukti DP
-                </h4>
-
-                <p class="payment-text mb-0">
-                    Upload bukti pembayaran setelah melakukan pembayaran DP melalui QRIS.
-                </p>
-
-            </div>
-
-            @if(session('upload_success'))
-                <div class="alert alert-success text-center">
-                    {{ session('upload_success') }}
-                </div>
-            @endif
-
-            @if($errors->has('bukti_pembayaran'))
-                <div class="alert alert-danger text-center">
-                    {{ $errors->first('bukti_pembayaran') }}
-                </div>
-            @endif
-
-            <form
-                action="{{ route(
-                    'booking.upload-bukti',
-                    session('kode_booking')
-                ) }}"
-                method="POST"
-                enctype="multipart/form-data"
-            >
-                @csrf
-
-                <div class="mb-4">
-
-                    <label
-                        for="bukti_pembayaran"
-                        class="form-label fw-bold text-cokelat"
-                    >
-                        Pilih Bukti Pembayaran
-                    </label>
-
-                    <input
-                        type="file"
-                        name="bukti_pembayaran"
-                        id="bukti_pembayaran"
-                        class="form-control upload-file-input"
-                        accept=".jpg,.jpeg,.png"
-                        required
-                    >
-
-                    <small class="text-muted d-block mt-2">
-                        Format JPG, JPEG, atau PNG. Maksimal 2 MB.
-                    </small>
-
-                </div>
-
-                <div class="d-grid d-md-flex justify-content-md-center">
-
-                    <button
-                        type="submit"
-                        class="btn btn-cokelat btn-lg px-md-5 upload-submit-button"
-                    >
-                        <i class="bi bi-cloud-arrow-up me-2"></i>
-                        Kirim Bukti Pembayaran
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-    </div>
-
-@endif
-
-@if( session('wajib_dp') && session('status_reservasi') === 'menunggu_verifikasi')
-
-    <div class="card border-0 shadow-sm mt-5 mb-5 mx-auto upload-payment-card">
-        <div class="card-body p-3 p-md-4 p-lg-5 text-center">
-
-            <div class="payment-icon mx-auto mb-3">
-                <i class="bi bi-shield-check"></i>
-            </div>
-
-            <small class="payment-label">
-                VERIFIKASI PEMBAYARAN
-            </small>
-
-            <h4 class="payment-title mt-2">
-                Bukti Pembayaran Sudah Dikirim
-            </h4>
-
-            <p class="payment-text mb-0">
-                Bukti pembayaran DP sedang diperiksa oleh admin.
-                Anda tidak perlu mengunggah bukti pembayaran kembali.
-            </p>
-
-        </div>
-    </div>
-
-@endif
-
 @else
 
                         
@@ -917,14 +896,13 @@ color:#fff;
     </label>
 
     <input
-        type="date"
-        id="monitor_tanggal"
-        class="form-control mb-4"
-        style="border: 2px solid #BA8E68;"
-        min="{{ now('Asia/Makassar')->format('Y-m-d') }}"
-        value="{{ now('Asia/Makassar')->format('Y-m-d') }}"
-        disabled
-    >
+    type="date"
+    id="monitor_tanggal"
+    class="form-control mb-4"
+    style="border: 2px solid #BA8E68;"
+    min="{{ now('Asia/Makassar')->format('Y-m-d') }}"
+    value="{{ old('tanggal', now('Asia/Makassar')->format('Y-m-d')) }}"
+>
 
                                 
 <div class="studio-info">
@@ -992,44 +970,48 @@ color:#fff;
                                 @endif
 
                                 <form
-                                    action="{{ route('booking.store') }}"
-                                    method="POST"
-                                    id="formBooking"
-                                    >
-                                    @csrf
-                                    <input
-    type="date"
-    id="monitor_tanggal"
-    class="form-control mb-4"
-    style="border: 2px solid #BA8E68;"
-    min="{{ now('Asia/Makassar')->format('Y-m-d') }}"
-    value="{{ old('tanggal', now('Asia/Makassar')->format('Y-m-d')) }}"
+    action="{{ route('booking.store') }}"
+    method="POST"
+    id="formBooking"
 >
-                                    <input
-                                    type="hidden"
-                                    name="package_id"
-                                    id="selected_package"
-                                    value="{{ old('package_id') }}"
-                                    required
-                                    >
-                                    <div class="alert mb-4 text-center" style="background-color: #F5EBE0; border: 2px solid #BA8E68; color: #4A3525;">
-    Jadwal Terpilih: <br>
+    @csrf
 
-    <h5 class="fw-bold mt-2 mb-0" id="teks_jadwal_terpilih">
-        Pilih jam di layar sebelah kiri ⬅️
-    </h5>
+ <input
+        type="hidden"
+        name="tanggal"
+        id="form_tanggal"
+        value="{{ old('tanggal', now('Asia/Makassar')->format('Y-m-d')) }}"
+    >
 
-    <select
-        name="jam_mulai"
-        id="form_jam"
-        class="form-select mt-2 d-none"
+    <input
+        type="hidden"
+        name="package_id"
+        id="selected_package"
+        value="{{ old('package_id') }}"
         required
     >
-        <option value="{{ old('jam_mulai') }}" selected>
-            {{ old('jam_mulai') ?: '-- Kosong --' }}
-        </option>
-    </select>
-</div>
+
+    <div
+        class="alert mb-4 text-center"
+        style="background-color: #F5EBE0; border: 2px solid #BA8E68; color: #4A3525;"
+    >
+        Jadwal Terpilih: <br>
+
+        <h5 class="fw-bold mt-2 mb-0" id="teks_jadwal_terpilih">
+            Pilih jam di layar sebelah kiri ⬅️
+        </h5>
+
+        <select
+            name="jam_mulai"
+            id="form_jam"
+            class="form-select mt-2 d-none"
+            required
+        >
+            <option value="{{ old('jam_mulai') }}" selected>
+                {{ old('jam_mulai') ?: '-- Kosong --' }}
+            </option>
+        </select>
+    </div>
 
 <div
     id="info-pembayaran"
@@ -1154,7 +1136,7 @@ color:#fff;
             data-nama-paket="{{ $item->nama_paket }}"
             data-wajib-dp="{{ $item->wajib_dp ? 1 : 0 }}"
             data-nominal-dp="{{ $item->nominal_dp }}"
-            data-durasi-menit="{{ $item->jumlah_slot * 30 }}"
+            data-durasi-menit="{{ $item->estimasi_durasi }}"
             >
 
                 @if($item->gambar)
@@ -1207,7 +1189,9 @@ color:#fff;
 
 </div>
 
-                                        <div class="mb-4">
+</div>
+
+<div class="mb-4">
     <label class="form-label fw-bold text-cokelat">
         Nama Lengkap
     </label>
@@ -1252,7 +1236,15 @@ color:#fff;
 
                                 </form>
 
-                <div
+            </div> <!-- card-body -->
+        </div> <!-- card -->
+    </div> <!-- col-lg-8 -->
+
+</div> <!-- row -->
+
+@endif
+
+<div
     class="modal fade"
     id="modalKonfirmasiBooking"
     tabindex="-1"
@@ -1375,18 +1367,10 @@ color:#fff;
             </div>
 
         </div>
-
     </div>
 </div>
 
-            </div> <!-- card-body -->
-        </div> <!-- card -->
-    </div> <!-- col-lg-8 -->
-
-</div> <!-- row -->
-
-@endif
-
+                
     <script>    
     document.addEventListener('DOMContentLoaded', function () {
 
@@ -1530,6 +1514,10 @@ const teksDpPaket =
                     const actionClick = isTersedia
                         ? `onclick="pilihJam(this, '${item.jam}', '${item.jam_selesai}')"`
                         : '';
+
+                    const sisaTeks = isTersedia
+                        ? 'Tersedia'
+                        : item.status;
 
                     gridHtml += `
                         <div
@@ -1725,15 +1713,44 @@ const teksDpPaket =
                 }
             );
 
-        teksTerpilih.innerHTML = `
-            <i class="bi bi-calendar-event me-2"></i>
-            ${formatTanggal}
+        const packageCard = document.querySelector(
+    '.paket-card.paket-selected'
+);
 
-            &nbsp;&nbsp;
+const durasiMenit = packageCard
+    ? Number(packageCard.dataset.durasiMenit || 30)
+    : 30;
 
-            <i class="bi bi-clock me-2"></i>
-            ${jam}–${jamSelesai} WITA
-        `;
+const [jamAngka, menitAngka] = jam
+    .split(':')
+    .map(Number);
+
+const waktuMulai = new Date(
+    2000,
+    0,
+    1,
+    jamAngka,
+    menitAngka
+);
+
+waktuMulai.setMinutes(
+    waktuMulai.getMinutes() + durasiMenit
+);
+
+const jamSelesaiOtomatis =
+    String(waktuMulai.getHours()).padStart(2, '0') +
+    ':' +
+    String(waktuMulai.getMinutes()).padStart(2, '0');
+
+teksTerpilih.innerHTML = `
+    <i class="bi bi-calendar-event me-2"></i>
+    ${formatTanggal}
+
+    &nbsp;&nbsp;
+
+    <i class="bi bi-clock me-2"></i>
+    ${jam}–${jamSelesaiOtomatis} WITA
+`;
 
         teksTerpilih.classList.remove(
             'text-danger'

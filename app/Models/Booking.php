@@ -11,29 +11,24 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'kode_booking',
-        'customer_name',
-        'no_hp',
-
-        'tanggal',
-        'jam_mulai',
-        'jam_selesai',
-
-        'package_id',
-
-        'jumlah_slot',
-        'durasi_menit',
-        'harga_saat_booking',
-
-        'wajib_dp',
-        'nominal_dp',
-        'bukti_dp',
-
-        'status',
-        'status_reservasi',
-        'status_pembayaran',
-        'alasan_bukti_ditolak',
-    ];
+    'kode_booking',
+    'customer_name',
+    'no_hp',
+    'tanggal',
+    'jam_mulai',
+    'jam_selesai',
+    'package_id',
+    'jumlah_slot',
+    'durasi_menit',
+    'harga_saat_booking',
+    'wajib_dp',
+    'nominal_dp',
+    'status',
+    'status_reservasi',
+    'status_pembayaran',
+    'bukti_dp',
+    'alasan_bukti_ditolak',
+];
 
     protected $casts = [
         'tanggal' => 'date',
@@ -50,4 +45,4 @@ class Booking extends Model
     {
         return $this->belongsTo(Package::class);
     }
-}
+} 

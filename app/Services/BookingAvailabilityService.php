@@ -7,62 +7,47 @@ use Carbon\Carbon;
 
 class BookingAvailabilityService
 {
-    private int $capacity = 3;
+    /**
+     * Jumlah fotografer yang dapat melayani
+     * booking secara bersamaan.
+     */
+    private int $capacity = 2;
 
-    public function generateSlots(
-        string $jamMulai,
-        int $jumlahSlot
-    ): array {
-        $slots = [];
-
-        $waktu = Carbon::createFromFormat('H:i', $jamMulai);
-
-        for ($i = 0; $i < $jumlahSlot; $i++) {
-            $slots[] = $waktu->format('H:i');
-            $waktu->addMinutes(30);
-        }
-
-        return $slots;
-    }
-
+    /**
+     * Menghitung jam selesai berdasarkan durasi paket.
+     */
     public function calculateEndTime(
         string $jamMulai,
-        int $jumlahSlot
+        int $durasiMenit
     ): string {
         return Carbon::createFromFormat('H:i', $jamMulai)
-            ->addMinutes($jumlahSlot * 30)
+            ->addMinutes($durasiMenit)
             ->format('H:i');
     }
 
+    /**
+     * Memeriksa apakah jadwal masih tersedia
+     * sepanjang durasi paket.
+     */
     public function isAvailable(
         string $tanggal,
         string $jamMulai,
-        int $jumlahSlot
+        int $durasiMenit
     ): bool {
-        $slots = $this->generateSlots($jamMulai, $jumlahSlot);
+        $waktuMulai = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $tanggal . ' ' . $jamMulai
+        );
 
-        foreach ($slots as $slot) {
-            $jumlahBooking = $this->countBookingsAtSlot(
-                $tanggal,
-                $slot
-            );
+        $waktuSelesai = $waktuMulai
+            ->copy()
+            ->addMinutes($durasiMenit);
 
-            if ($jumlahBooking >= $this->capacity) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function countBookingsAtSlot(
-        string $tanggal,
-        string $slot
-    ): int {
-        $slotStart = Carbon::createFromFormat('H:i', $slot);
-        $slotEnd = $slotStart->copy()->addMinutes(30);
-
-        return Booking::query()
+        /*
+         * Ambil semua booking aktif yang bertabrakan
+         * dengan rentang booking baru.
+         */
+        $bookingBentrok = Booking::query()
             ->whereDate('tanggal', $tanggal)
             ->whereIn('status_reservasi', [
                 'menunggu_pembayaran',
@@ -73,13 +58,99 @@ class BookingAvailabilityService
             ->whereTime(
                 'jam_mulai',
                 '<',
-                $slotEnd->format('H:i:s')
+                $waktuSelesai->format('H:i:s')
             )
             ->whereTime(
                 'jam_selesai',
                 '>',
-                $slotStart->format('H:i:s')
+                $waktuMulai->format('H:i:s')
             )
-            ->count();
+            ->get([
+                'jam_mulai',
+                'jam_selesai',
+            ]);
+
+        /*
+         * Tidak ada booking yang bertabrakan.
+         */
+        if ($bookingBentrok->isEmpty()) {
+            return true;
+        }
+
+        /*
+         * Kumpulkan titik waktu yang perlu diperiksa.
+         */
+        $titikPemeriksaan = [
+            $waktuMulai->timestamp,
+        ];
+
+        foreach ($bookingBentrok as $booking) {
+            $mulaiBooking = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                $tanggal . ' ' . $booking->jam_mulai
+            );
+
+            $selesaiBooking = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                $tanggal . ' ' . $booking->jam_selesai
+            );
+
+            if (
+                $mulaiBooking->greaterThanOrEqualTo($waktuMulai)
+                && $mulaiBooking->lessThan($waktuSelesai)
+            ) {
+                $titikPemeriksaan[] = $mulaiBooking->timestamp;
+            }
+
+            if (
+                $selesaiBooking->greaterThan($waktuMulai)
+                && $selesaiBooking->lessThan($waktuSelesai)
+            ) {
+                $titikPemeriksaan[] = $selesaiBooking->timestamp;
+            }
+        }
+
+        $titikPemeriksaan = array_unique($titikPemeriksaan);
+        sort($titikPemeriksaan);
+
+        /*
+         * Periksa jumlah booking aktif pada setiap
+         * bagian rentang waktu.
+         */
+        foreach ($titikPemeriksaan as $timestamp) {
+            $waktuPeriksa = Carbon::createFromTimestamp($timestamp);
+
+            $jumlahBookingAktif = $bookingBentrok
+                ->filter(function ($booking) use (
+                    $tanggal,
+                    $waktuPeriksa
+                ) {
+                    $mulaiBooking = Carbon::createFromFormat(
+                        'Y-m-d H:i:s',
+                        $tanggal . ' ' . $booking->jam_mulai
+                    );
+
+                    $selesaiBooking = Carbon::createFromFormat(
+                        'Y-m-d H:i:s',
+                        $tanggal . ' ' . $booking->jam_selesai
+                    );
+
+                    return $mulaiBooking
+                        ->lessThanOrEqualTo($waktuPeriksa)
+                        && $selesaiBooking
+                            ->greaterThan($waktuPeriksa);
+                })
+                ->count();
+
+            /*
+             * Jika sudah ada dua booking aktif,
+             * booking baru tidak boleh masuk.
+             */
+            if ($jumlahBookingAktif >= $this->capacity) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

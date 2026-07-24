@@ -116,8 +116,7 @@ class BookingController extends Controller
                 );
         }
 
-        $jumlahSlot = (int) $package->jumlah_slot;
-        $durasiMenit = $jumlahSlot * 30;
+        $durasiMenit = (int) $package->estimasi_durasi;
 
         /*
         |--------------------------------------------------------------------------
@@ -125,10 +124,10 @@ class BookingController extends Controller
         |--------------------------------------------------------------------------
         */
         $jamSelesai = $this->bookingAvailabilityService
-            ->calculateEndTime(
-                $validated['jam_mulai'],
-                $jumlahSlot
-            );
+        ->calculateEndTime(
+        $validated['jam_mulai'],
+        $durasiMenit
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -150,11 +149,11 @@ class BookingController extends Controller
         |--------------------------------------------------------------------------
         */
         $tersedia = $this->bookingAvailabilityService
-            ->isAvailable(
-                $validated['tanggal'],
-                $validated['jam_mulai'],
-                $jumlahSlot
-            );
+        ->isAvailable(
+        $validated['tanggal'],
+        $validated['jam_mulai'],
+        $durasiMenit
+        );
 
         if (!$tersedia) {
             return back()
@@ -206,7 +205,7 @@ class BookingController extends Controller
 
             'package_id' => $package->id,
 
-            'jumlah_slot' => $jumlahSlot,
+            'jumlah_slot' => $package->jumlah_slot, // untuk kompatibilitas
             'durasi_menit' => $durasiMenit,
 
             /*
@@ -216,12 +215,6 @@ class BookingController extends Controller
             'harga_saat_booking' => $package->harga,
             'wajib_dp' => $package->wajib_dp,
             'nominal_dp' => $package->nominal_dp,
-
-            /*
-             * Kolom status lama tetap diisi sementara
-             * agar halaman lama tidak langsung rusak.
-             */
-            'status' => 'Pending',
 
             /*
              * Status Smart Booking.
@@ -253,7 +246,7 @@ class BookingController extends Controller
     }
 
         public function pembayaran($kode_booking)
-    {
+{
     $booking = Booking::where(
         'kode_booking',
         $kode_booking
@@ -263,95 +256,165 @@ class BookingController extends Controller
         'booking.pembayaran',
         compact('booking')
     );
+}
+
+public function uploadBukti(
+    Request $request,
+    string $kode_booking
+) {
+    $validated = $request->validate([
+        'bukti_pembayaran' => [
+            'required',
+            'image',
+            'mimes:jpg,jpeg,png,webp',
+            'max:2048',
+        ],
+    ], [
+        'bukti_pembayaran.required' =>
+            'Bukti pembayaran wajib dipilih.',
+
+        'bukti_pembayaran.image' =>
+            'Bukti pembayaran harus berupa gambar.',
+
+        'bukti_pembayaran.mimes' =>
+            'Format bukti pembayaran harus JPG, JPEG, PNG, atau WEBP.',
+
+        'bukti_pembayaran.max' =>
+            'Ukuran bukti pembayaran maksimal 2 MB.',
+    ]);
+
+    $booking = Booking::query()
+        ->where('kode_booking', $kode_booking)
+        ->firstOrFail();
+
+    if (in_array($booking->status_reservasi, [
+        'berlangsung',
+        'selesai',
+    ], true)) {
+        return back()->with(
+            'error',
+            'Booking ini sudah tidak dapat mengunggah bukti pembayaran.'
+        );
     }
 
-    /**
-     * Mengambil daftar jam yang tersedia berdasarkan
-     * tanggal dan paket yang dipilih.
+    if ($booking->status_pembayaran === 'terverifikasi') {
+        return back()->with(
+            'error',
+            'Pembayaran sudah diverifikasi oleh admin.'
+        );
+    }
+
+    $path = $validated['bukti_pembayaran']->store(
+        'bukti-dp',
+        'public'
+    );
+
+    $booking->update([
+        'bukti_dp' => $path,
+        'status_pembayaran' => 'menunggu_verifikasi',
+        'status_reservasi' => 'menunggu_verifikasi',
+        'alasan_bukti_ditolak' => null,
+    ]);
+
+    return redirect()
+    ->route(
+        'booking.pembayaran',
+        $booking->kode_booking
+    )
+    ->with(
+        'upload_success',
+        'Bukti pembayaran berhasil dikirim dan sedang menunggu verifikasi admin.'
+    );
+}
+
+/**
+ * Mengambil daftar jam yang tersedia berdasarkan
+ * tanggal dan paket yang dipilih.
+ */
+public function getAvailableTimes(Request $request)
+{
+
+    $validated = $request->validate([
+        'tanggal' => [
+            'required',
+            'date',
+        ],
+        'package_id' => [
+            'nullable',
+            'integer',
+            'exists:packages,id',
+        ],
+    ]);
+
+    /*
+     * Jika package_id belum dikirim,
+     * gunakan durasi default 30 menit.
      */
-    public function getAvailableTimes(Request $request)
-    {
-        $validated = $request->validate([
-            'tanggal' => [
-                'required',
-                'date',
-            ],
-            'package_id' => [
-                'nullable',
-                'integer',
-                'exists:packages,id',
-            ],
-        ]);
+    $durasiMenit = 30;
+
+    if (!empty($validated['package_id'])) {
+        $package = Package::query()
+            ->where('aktif', true)
+            ->find($validated['package_id']);
+
+        if (!$package) {
+            return response()->json([
+                'dropdown' => [],
+                'detail' => [],
+                'message' => 'Paket tidak tersedia.',
+            ], 422);
+        }
+
+        $durasiMenit = (int) $package->estimasi_durasi;
+    }
+
+    $allTimeSlots = $this->generateTimeSlots();
+
+    $availableDropdown = [];
+    $jadwalDetail = [];
+
+    foreach ($allTimeSlots as $slot) {
+        $jamSelesai = $this->bookingAvailabilityService
+            ->calculateEndTime(
+                $slot,
+                $durasiMenit
+            );
 
         /*
-         * Jika package_id belum dikirim oleh halaman,
-         * pengecekan sementara menggunakan satu slot.
+         * Slot tidak boleh melewati pukul 21.00.
          */
-        $jumlahSlot = 1;
+        $masihDalamJamOperasional = $jamSelesai <= '21:00';
 
-        if (!empty($validated['package_id'])) {
-            $package = Package::query()
-                ->where('aktif', true)
-                ->find($validated['package_id']);
+        $tersedia = false;
 
-            if (!$package) {
-                return response()->json([
-                    'dropdown' => [],
-                    'detail' => [],
-                    'message' => 'Paket tidak tersedia.',
-                ], 422);
-            }
-
-            $jumlahSlot = (int) $package->jumlah_slot;
-        }
-
-        $allTimeSlots = $this->generateTimeSlots();
-
-        $availableDropdown = [];
-        $jadwalDetail = [];
-
-        foreach ($allTimeSlots as $slot) {
-            $jamSelesai = $this->bookingAvailabilityService
-                ->calculateEndTime(
+        if ($masihDalamJamOperasional) {
+            $tersedia = $this->bookingAvailabilityService
+                ->isAvailable(
+                    $validated['tanggal'],
                     $slot,
-                    $jumlahSlot
+                    $durasiMenit
                 );
-
-            /*
-             * Slot tidak boleh melewati pukul 21.00.
-             */
-            $masihDalamJamOperasional = $jamSelesai <= '21:00';
-
-            $tersedia = false;
-
-            if ($masihDalamJamOperasional) {
-                $tersedia = $this->bookingAvailabilityService
-                    ->isAvailable(
-                        $validated['tanggal'],
-                        $slot,
-                        $jumlahSlot
-                    );
-            }
-
-            if ($tersedia) {
-                $availableDropdown[] = $slot;
-            }
-
-            $jadwalDetail[] = [
-                'jam' => $slot,
-                'jam_selesai' => $jamSelesai,
-                'sisa' => $tersedia ? 1 : 0,
-                'status' => $tersedia
-                    ? 'Tersedia'
-                    : 'Penuh',
-            ];
         }
 
-        return response()->json([
-            'dropdown' => $availableDropdown,
-            'detail' => $jadwalDetail,
-        ]);
+        if ($tersedia) {
+            $availableDropdown[] = $slot;
+        }
+
+        $jadwalDetail[] = [
+            'jam' => $slot,
+            'jam_selesai' => $jamSelesai,
+            'sisa' => $tersedia ? 1 : 0,
+            'status' => $tersedia
+                ? 'Tersedia'
+                : 'Penuh',
+        ];
     }
+
+    return response()->json([
+        'dropdown' => $availableDropdown,
+        'detail' => $jadwalDetail,
+    ]);
+}
 
     /**
      * Mengunduh bukti booking dalam bentuk PDF.

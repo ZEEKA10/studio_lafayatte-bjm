@@ -24,17 +24,26 @@ public function __construct($bookings)
     return $this->bookings->map(function ($booking) {
 
         return [
-
             $booking->kode_booking,
             $booking->customer_name,
             $booking->no_hp,
             $booking->package->nama_paket ?? '-',
-            \Carbon\Carbon::parse($booking->tanggal)->translatedFormat('d F Y'),
-            \Carbon\Carbon::parse($booking->jam_mulai)->format('H:i'),
-            $booking->status
 
+            \Carbon\Carbon::parse($booking->tanggal)
+                ->locale('id')
+                ->translatedFormat('d F Y'),
+
+            \Carbon\Carbon::parse($booking->jam_mulai)
+                ->format('H:i'),
+
+            ucwords(
+                str_replace(
+                    '_',
+                    ' ',
+                    $booking->status_reservasi
+                )
+            ),
         ];
-
     });
 }
 

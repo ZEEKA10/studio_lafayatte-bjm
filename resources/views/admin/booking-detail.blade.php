@@ -249,65 +249,94 @@
                     <div class="d-flex flex-wrap gap-2">
 
                         @if(
-                        $booking->status_reservasi === 'menunggu_verifikasi'
-                        && $booking->bukti_pembayaran
-                        )
-                            <form
-                                action="{{ route('admin.updateStatus', $booking->id) }}"
-                                method="POST"
-                            >
-                                @csrf
+    $booking->status_reservasi === 'menunggu_verifikasi'
+    && $booking->bukti_dp
+)
 
-                                <input
-                                    type="hidden"
-                                    name="status_reservasi"
-                                    value="terkonfirmasi"
-                                >
-
-                                <input
-                                    type="hidden"
-                                    name="status_pembayaran"
-                                    value="terverifikasi"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-success"
-                                    onclick="return confirm('Yakin bukti pembayaran sudah valid?')"
-                                >
-                                    <i class="bi bi-shield-check me-1"></i>
-                                    Verifikasi DP
-                                </button>
-                            </form>
-                            <form
-    action="{{ route('admin.updateStatus', $booking->id) }}"
-    method="POST"
->
-    @csrf
-
-    <input
-        type="hidden"
-        name="status_reservasi"
-        value="menunggu_pembayaran"
+    {{-- Tombol verifikasi pembayaran --}}
+    <form
+        action="{{ route('admin.updateStatus', $booking->id) }}"
+        method="POST"
     >
+        @csrf
 
-    <input
-        type="hidden"
-        name="status_pembayaran"
-        value="perlu_upload_ulang"
+        <input
+            type="hidden"
+            name="status_reservasi"
+            value="terkonfirmasi"
+        >
+
+        <input
+            type="hidden"
+            name="status_pembayaran"
+            value="terverifikasi"
+        >
+
+        <button
+            type="submit"
+            class="btn btn-success w-100"
+            onclick="return confirm('Yakin bukti pembayaran sudah valid?')"
+        >
+            <i class="bi bi-shield-check me-1"></i>
+            Verifikasi DP
+        </button>
+    </form>
+
+    {{-- Form meminta upload ulang --}}
+    <form
+        action="{{ route('admin.updateStatus', $booking->id) }}"
+        method="POST"
+        class="w-100 mt-2"
     >
+        @csrf
 
-    <button
-        type="submit"
-        class="btn btn-outline-danger"
-        onclick="return confirm('Minta customer mengunggah ulang bukti pembayaran?')"
-    >
-        <i class="bi bi-arrow-repeat me-1"></i>
-        Minta Upload Ulang
-    </button>
-</form>
+        <input
+            type="hidden"
+            name="status_reservasi"
+            value="menunggu_pembayaran"
+        >
 
-                        @endif
+        <input
+            type="hidden"
+            name="status_pembayaran"
+            value="perlu_upload_ulang"
+        >
+
+        <div class="mb-2">
+            <label
+                for="alasan_bukti_ditolak"
+                class="form-label fw-semibold"
+            >
+                Alasan upload ulang
+            </label>
+
+            <textarea
+                name="alasan_bukti_ditolak"
+                id="alasan_bukti_ditolak"
+                class="form-control"
+                rows="3"
+                placeholder="Contoh: Bukti pembayaran buram atau nominal tidak terlihat."
+                required
+            >{{ old('alasan_bukti_ditolak') }}</textarea>
+
+            @error('alasan_bukti_ditolak')
+                <div class="text-danger small mt-1">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-outline-danger w-100"
+            onclick="return confirm('Yakin meminta customer mengunggah ulang bukti pembayaran?')"
+        >
+            <i class="bi bi-arrow-repeat me-1"></i>
+            Minta Upload Ulang
+        </button>
+    </form>
+
+@endif
 
                         @if($booking->status_reservasi === 'terkonfirmasi')
                             <form
@@ -375,17 +404,17 @@
                         Bukti Pembayaran DP
                     </h5>
 
-                    @if($booking->bukti_pembayaran)
+                    @if($booking->bukti_dp)
 
                         <a
-                            href="{{ asset('storage/' . $booking->bukti_pembayaran) }}"
-                            target="_blank"
+                        href="{{ asset('storage/' . $booking->bukti_dp) }}"
+                        target="_blank"
                         >
-                            <img
-                                src="{{ asset('storage/' . $booking->bukti_pembayaran) }}"
-                                alt="Bukti Pembayaran"
-                                class="bukti-pembayaran"
-                            >
+                        <img
+                        src="{{ asset('storage/' . $booking->bukti_dp) }}"
+                        alt="Bukti Pembayaran"
+                        class="bukti-pembayaran"
+                        >
                         </a>
 
                         <p class="text-muted small mt-3 mb-0">
