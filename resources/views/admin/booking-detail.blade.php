@@ -250,7 +250,7 @@
 
                         @if(
     $booking->status_reservasi === 'menunggu_verifikasi'
-    && $booking->bukti_dp
+    && $booking->bukti_pembayaran
 )
 
     {{-- Tombol verifikasi pembayaran --}}
@@ -404,14 +404,14 @@
                         Bukti Pembayaran DP
                     </h5>
 
-                    @if($booking->bukti_dp)
+                    @if($booking->bukti_pembayaran)
 
                         <a
-                        href="{{ asset('storage/' . $booking->bukti_dp) }}"
+                        href="{{ asset('storage/' . $booking->bukti_pembayaran) }}"
                         target="_blank"
                         >
                         <img
-                        src="{{ asset('storage/' . $booking->bukti_dp) }}"
+                        src="{{ asset('storage/' . $booking->bukti_pembayaran) }}"
                         alt="Bukti Pembayaran"
                         class="bukti-pembayaran"
                         >

@@ -754,50 +754,44 @@ color:#fff;
     DP Pembayaran
 </h4>
 
-@if(session('wajib_dp'))
+@if((int) session('nominal_dp', 0) > 0)
 
-<p class="payment-text mb-2">
-    DP yang harus dibayar:
-</p>
+    <p class="payment-text mb-2">
+        DP yang harus dibayar:
+    </p>
 
-<h2 class="fw-bold text-cokelat">
-    Rp {{ number_format(session('nominal_dp'),0,',','.') }}
-</h2>
+    <h2 class="fw-bold text-cokelat">
+        Rp {{ number_format((int) session('nominal_dp'), 0, ',', '.') }}
+    </h2>
 
-<div class="alert alert-light border mt-4 mb-3">
+    <div class="alert alert-light border mt-4 mb-3">
+        <i class="bi bi-info-circle me-2"></i>
 
-    <i class="bi bi-info-circle me-2"></i>
+        Sisa pembayaran dapat dilunasi langsung di studio
+        sebelum sesi pemotretan dimulai.
+    </div>
 
-    Sisa pembayaran dapat dilunasi langsung di studio
-    sebelum sesi pemotretan dimulai.
-
-</div>
-
-<a
-href="https://wa.me/6285216962962?text={{ urlencode(
-'Halo Admin Lafayette Photo Studio, saya ingin meminta QRIS pembayaran DP untuk booking dengan kode '.session('kode_booking')
-) }}"
-target="_blank"
-class="btn btn-success w-100"
->
-
-<i class="bi bi-whatsapp me-2"></i>
-
-Minta QRIS via WhatsApp
-
-</a>
+    <a
+        href="https://wa.me/6285216962962?text={{ urlencode(
+            'Halo Admin Lafayette Photo Studio, saya ingin meminta QRIS pembayaran DP untuk booking dengan kode ' .
+            session('kode_booking')
+        ) }}"
+        target="_blank"
+        class="btn btn-success w-100"
+    >
+        <i class="bi bi-whatsapp me-2"></i>
+        Minta QRIS via WhatsApp
+    </a>
 
 @else
 
-<div class="alert alert-success mb-0">
+    <div class="alert alert-success mb-0">
+        Paket ini tidak memerlukan DP.
 
-    Paket ini tidak memerlukan DP.
+        <br>
 
-    <br>
-
-    Pembayaran dilakukan langsung di studio.
-
-</div>
+        Pembayaran dilakukan langsung di studio.
+    </div>
 
 @endif
 

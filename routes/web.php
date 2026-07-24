@@ -20,6 +20,16 @@ Route::post('/admin/logout', [AdminController::class, 'logout'])
 
 
 // =============================
+// RUTE PELANGGAN
+// =============================
+
+Route::post(
+    '/booking/{kode_booking}/upload-bukti',
+    [BookingController::class, 'uploadBukti']
+)->name('booking.upload-bukti');
+
+
+// =============================
 // RUTE ADMIN (HARUS LOGIN)
 // =============================
 
@@ -29,34 +39,44 @@ Route::middleware('auth')->group(function () {
         ->name('admin.dashboard');
 
     Route::get(
-    '/admin/notifikasi-booking',
-    [AdminController::class, 'notifikasiBooking']
+        '/admin/notifikasi-booking',
+        [AdminController::class, 'notifikasiBooking']
     )->name('admin.notifikasiBooking');
 
-    Route::get('/admin/booking/{id}', [AdminController::class, 'bookingDetail'])
-    ->name('admin.bookingDetail');
+    Route::get(
+        '/admin/booking/{id}',
+        [AdminController::class, 'bookingDetail']
+    )->name('admin.bookingDetail');
 
-    Route::get('/admin/export-excel', [AdminController::class, 'exportExcel'])
-        ->name('admin.exportExcel');
+    Route::get(
+        '/admin/export-excel',
+        [AdminController::class, 'exportExcel']
+    )->name('admin.exportExcel');
 
-    Route::get('/admin/export-pdf', [AdminController::class, 'exportPdf'])
-    ->name('admin.exportPdf');
-
-    Route::post('/admin/checkin', [AdminController::class, 'checkIn'])
-        ->name('admin.checkin');
-
-    Route::post('/admin/booking/{id}/status', [AdminController::class, 'updateStatus'])
-        ->name('admin.updateStatus');
-
-    Route::delete('/admin/booking/{id}', [AdminController::class, 'deleteBooking'])
-        ->name('admin.deleteBooking');
+    Route::get(
+        '/admin/export-pdf',
+        [AdminController::class, 'exportPdf']
+    )->name('admin.exportPdf');
 
     Route::post(
-    '/booking/{kode_booking}/upload-bukti',
-    [BookingController::class, 'uploadBukti']
-    )->name('booking.upload-bukti');
+        '/admin/checkin',
+        [AdminController::class, 'checkIn']
+    )->name('admin.checkin');
 
-    Route::resource('/admin/packages', App\Http\Controllers\PackageController::class);
+    Route::post(
+        '/admin/booking/{id}/status',
+        [AdminController::class, 'updateStatus']
+    )->name('admin.updateStatus');
+
+    Route::delete(
+        '/admin/booking/{id}',
+        [AdminController::class, 'deleteBooking']
+    )->name('admin.deleteBooking');
+
+    Route::resource(
+        '/admin/packages',
+        App\Http\Controllers\PackageController::class
+    );
 
 });
 

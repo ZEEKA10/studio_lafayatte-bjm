@@ -89,6 +89,12 @@
     Hubungi Admin via WhatsApp
 </a>
 
+@if (session('upload_success'))
+    <div class="alert alert-success">
+        {{ session('upload_success') }}
+    </div>
+@endif
+
 @if (session('error'))
     <div class="alert alert-danger">
         {{ session('error') }}

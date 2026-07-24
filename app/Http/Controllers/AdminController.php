@@ -175,10 +175,10 @@ class AdminController extends Controller
         return back()->with('error', 'Gagal: Kode Booking tidak ditemukan di database.');
     }
 
-    // Fungsi untuk mengubah status booking secara manual[cite: 2, 4]
-    public function updateStatus(Request $request, $id)
+    // Fungsi untuk mengubah status booking secara manual
+public function updateStatus(Request $request, $id)
 {
-    $request->validate([
+    $validated = $request->validate([
         'status_reservasi' => [
             'required',
             'in:menunggu_pembayaran,menunggu_verifikasi,terkonfirmasi,berlangsung,selesai',
@@ -199,16 +199,21 @@ class AdminController extends Controller
     $booking = Booking::findOrFail($id);
 
     $dataUpdate = [
-        'status_reservasi' => $request->status_reservasi,
+        'status_reservasi' => $validated['status_reservasi'],
     ];
 
-    if ($request->filled('status_pembayaran')) {
+    if (!empty($validated['status_pembayaran'])) {
         $dataUpdate['status_pembayaran'] =
-            $request->status_pembayaran;
+            $validated['status_pembayaran'];
     }
 
+    /*
+     * Jika admin meminta pelanggan upload ulang,
+     * alasan wajib diisi.
+     */
     if (
-        $request->status_pembayaran === 'perlu_upload_ulang'
+        ($validated['status_pembayaran'] ?? null)
+        === 'perlu_upload_ulang'
     ) {
         $request->validate([
             'alasan_bukti_ditolak' => [
@@ -222,8 +227,13 @@ class AdminController extends Controller
             $request->alasan_bukti_ditolak;
     }
 
+    /*
+     * Jika pembayaran sudah diverifikasi,
+     * hapus alasan penolakan sebelumnya.
+     */
     if (
-        $request->status_pembayaran === 'terverifikasi'
+        ($validated['status_pembayaran'] ?? null)
+        === 'terverifikasi'
     ) {
         $dataUpdate['alasan_bukti_ditolak'] = null;
     }

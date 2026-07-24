@@ -26,7 +26,7 @@ class Booking extends Model
     'status',
     'status_reservasi',
     'status_pembayaran',
-    'bukti_dp',
+    'bukti_pembayaran',
     'alasan_bukti_ditolak',
 ];
 

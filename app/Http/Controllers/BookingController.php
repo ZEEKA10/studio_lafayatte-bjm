@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Package;
 use App\Models\Booking;
 use Carbon\Carbon;
@@ -304,16 +305,23 @@ public function uploadBukti(
         );
     }
 
-    $path = $validated['bukti_pembayaran']->store(
-        'bukti-dp',
-        'public'
-    );
+if (
+    $booking->bukti_pembayaran &&
+    Storage::disk('public')->exists($booking->bukti_pembayaran)
+) {
+    Storage::disk('public')->delete($booking->bukti_pembayaran);
+}
+
+$path = $validated['bukti_pembayaran']->store(
+    'bukti-dp',
+    'public'
+);
 
     $booking->update([
-        'bukti_dp' => $path,
-        'status_pembayaran' => 'menunggu_verifikasi',
-        'status_reservasi' => 'menunggu_verifikasi',
-        'alasan_bukti_ditolak' => null,
+    'bukti_pembayaran' => $path,
+    'status_pembayaran' => 'menunggu_verifikasi',
+    'status_reservasi' => 'menunggu_verifikasi',
+    'alasan_bukti_ditolak' => null,
     ]);
 
     return redirect()
